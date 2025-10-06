@@ -30,11 +30,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.auth0.android.Auth0
 import com.auth0.android.result.Credentials
 import com.example.awaq1.R
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 
 
 @Composable
@@ -79,11 +85,14 @@ fun LogIn(
                     .fillMaxWidth()
             )
             //Contraseña
+
+            var passwordVisible by remember { mutableStateOf(false) }
+
             TextField (
                 value = password,
                 onValueChange = {password = it },
                 label = { Text("Contraseña") },
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 singleLine = true,
                 keyboardActions = KeyboardActions(onDone = {
                     loginWithUsernamePassword(auth0, username, password, onLoginSuccess, onError = { message ->
@@ -93,7 +102,19 @@ fun LogIn(
                 }),
                 modifier = Modifier
                     .padding(top = 10.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                trailingIcon = {
+                    val image = if (passwordVisible)
+                        Icons.Filled.Visibility
+                    else Icons.Filled.VisibilityOff
+
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            imageVector = image,
+                            contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                        )
+                    }
+                }
             )
             //Olvidaste Contraseña
             Text(text = stringResource(R.string.forgot_password),

@@ -115,6 +115,7 @@ dependencies {
 
     // Include the Compose BOM for Android Test dependencies
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.01"))
+    implementation("androidx.compose.material:material-icons-extended")
 }
 
 configurations.all {
