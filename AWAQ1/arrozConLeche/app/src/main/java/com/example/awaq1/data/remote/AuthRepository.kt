@@ -8,7 +8,7 @@ class AuthRepository(
     private val tokenManager: TokenManager
 ) {
     suspend fun signIn(email: String, password: String) {
-        val response = apiService.signIn(AuthRequest(email, password,"biomo-key-456"))
+        val response = apiService.signIn(AuthRequest(email, password))
         if (response.isSuccessful && response.body() != null) {
             val token = response.body()!!.token
             tokenManager.saveToken(token)
