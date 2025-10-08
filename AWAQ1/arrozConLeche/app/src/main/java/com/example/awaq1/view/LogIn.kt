@@ -41,17 +41,34 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.rememberCoroutineScope
+import com.example.awaq1.data.remote.AuthRepository
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun LogIn(
-    auth0: Auth0,
-    onLoginSuccess: (Credentials, String) -> Unit,
+    authRepository: AuthRepository,
+    onLoginSuccess: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+
+    fun doSignIn() {
+        errorMessage = null
+        scope.launch {
+            try {
+                // Llama a tu backend (guarda el token en TokenManager)
+                authRepository.signIn(username, password)
+                onLoginSuccess(username)
+            } catch (e: Exception) {
+                errorMessage = e.message ?: "Error de autenticación."
+            }
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         Image(painter = painterResource(R.drawable.background),
@@ -94,12 +111,11 @@ fun LogIn(
                 label = { Text("Contraseña") },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 singleLine = true,
-                keyboardActions = KeyboardActions(onDone = {
-                    loginWithUsernamePassword(auth0, username, password, onLoginSuccess, onError = { message ->
-                        errorMessage = message // Actualiza el mensaje de error si ocurre un problema
-                    })
-                    defaultKeyboardAction(ImeAction.Done)
-                }),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        doSignIn()
+                    }
+                ),
                 modifier = Modifier
                     .padding(top = 10.dp)
                     .fillMaxWidth(),
@@ -126,9 +142,7 @@ fun LogIn(
             )
             //Entrar
             Button(onClick = {
-                loginWithUsernamePassword(auth0, username, password, onLoginSuccess, onError = { message ->
-                    errorMessage = message // Actualiza el mensaje de error si ocurre un problema
-                })
+                doSignIn()
             },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)

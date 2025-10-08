@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,9 +35,11 @@ import com.auth0.android.result.Credentials
 import com.example.awaq1.MainActivity
 import com.example.awaq1.R
 import com.example.awaq1.data.AccountInfo
+import com.example.awaq1.data.remote.AuthRepository
 import com.example.awaq1.data.usuario.UsuarioEntity
 import com.example.awaq1.navigator.AppNavigator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
@@ -58,28 +61,30 @@ suspend fun setAccountInfoOnLogin(context: MainActivity, username: String) {
 }
 
 @Composable
-fun PrincipalView(modifier: Modifier = Modifier, auth0: Auth0) {
+fun PrincipalView(
+    modifier: Modifier = Modifier,
+    authRepository: AuthRepository
+) {
     var loggedIn by remember { mutableStateOf(false) }
-    var credentials by remember { mutableStateOf<Credentials?>(null) }
     val context = LocalContext.current as MainActivity
+    val scope = rememberCoroutineScope()
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         //context.accountInfo = AccountInfo("example@example.com", user_id = 1L)
         if (loggedIn) { // loggedIn o true
             AppNavigator(
                 onLogout = {
-                    Log.d("AuthLogout", "Logging out!")
-                    credentials = null
                     loggedIn = false
                 },
                 Modifier.padding(innerPadding))
         } else {
             LogIn(
-                auth0 = auth0,
-                onLoginSuccess =  { cred, user ->
-                    runBlocking { setAccountInfoOnLogin(context, user) }
-                    credentials = cred
-                    loggedIn = true
+                authRepository = authRepository,
+                onLoginSuccess =  { username ->
+                    scope.launch {
+                        setAccountInfoOnLogin(context, username)
+                        loggedIn = true
+                    }
                 },
                 modifier = Modifier.padding(innerPadding)
             )
