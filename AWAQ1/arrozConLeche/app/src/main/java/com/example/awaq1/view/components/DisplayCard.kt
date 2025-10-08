@@ -1,4 +1,4 @@
-package com.example.awaq1.view.Components
+package com.example.awaq1.view.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable

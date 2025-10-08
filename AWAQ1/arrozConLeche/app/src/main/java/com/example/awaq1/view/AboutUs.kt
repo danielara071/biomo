@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.awaq1.R
+import com.example.awaq1.view.components.BottomNavigationBar
 
 @Composable
 fun AboutUs(navController: NavController) {

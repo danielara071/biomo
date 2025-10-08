@@ -1,4 +1,4 @@
-package com.example.awaq1.view
+package com.example.awaq1.view.formularios
 
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.example.awaq1.MainActivity
 import com.example.awaq1.R
+import com.example.awaq1.data.formularios.FormularioUnoEntity
 import kotlinx.coroutines.runBlocking
 import androidx.compose.material.icons.Icons
 import android.os.Build
@@ -44,62 +45,65 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Checkbox
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.awaq1.ViewModels.CameraViewModel
-import com.example.awaq1.data.formularios.FormularioSieteEntity
 import com.example.awaq1.data.formularios.ImageEntity
 import com.example.awaq1.data.formularios.Ubicacion
-import com.google.gson.Gson
+import com.example.awaq1.view.CameraWindow
 import kotlinx.coroutines.flow.first
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Preview(showBackground = true, showSystemUi = false)
 @Composable
-fun PreviewForm7() {
-    ObservationFormSiete(rememberNavController())
+fun Preview() {
+    ObservationForm(rememberNavController())
 }
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
+fun ObservationForm(navController: NavController, formularioId: Long = 0L) {
     val context = LocalContext.current as MainActivity
     val appContainer = context.container
-    var showCamera by remember { mutableStateOf(false) }
-    val cameraViewModel: CameraViewModel = viewModel()
-    val savedImageUris = remember { mutableStateOf(mutableListOf<Uri>()) }
+
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     val ubicacion = Ubicacion(context)
 
+    var transecto by remember { mutableStateOf("") }
     var clima by remember { mutableStateOf("") }
     var temporada by remember { mutableStateOf("Verano/Seca") }
-    var zona by remember { mutableStateOf("") }
-    var pluviosidad by remember { mutableStateOf("") }
-    var temperaturaMaxima by remember { mutableStateOf("") }
-    var humedadMaxima by remember { mutableStateOf("") }
-    var temperaturaMinima by remember { mutableStateOf("") }
-    var nivelQuebrada by remember { mutableStateOf("") }
+    var tipoAnimal by remember { mutableStateOf("") }
+    var nombreComun by remember { mutableStateOf("") }
+    var nombreCientifico by remember { mutableStateOf("") }
+    var numeroIndividuos by remember { mutableStateOf("") }
+    var tipoObservacion by remember { mutableStateOf("") }
+    var observaciones by remember { mutableStateOf("") }
     var fecha by remember { mutableStateOf("") }
     var editado by remember { mutableStateOf("") }
-
+    val cameraViewModel: CameraViewModel = viewModel()
+    var showCamera by remember { mutableStateOf(false) }
+    val savedImageUris = remember { mutableStateOf(mutableListOf<Uri>()) }
 
     if (formularioId != 0L) {
-        val formulario: FormularioSieteEntity? = runBlocking {
-            Log.d("Formulario7Loading", "Loading formulario7 with ID $formularioId")
-            appContainer.formulariosRepository.getFormularioSieteStream(formularioId).first()
+        val formulario: FormularioUnoEntity? = runBlocking {
+            Log.d("Formulario1Loading", "Loading formulario1 with ID $formularioId")
+            appContainer.formulariosRepository.getFormularioUnoStream(formularioId).first()
         }
 
         if (formulario != null) {
+            transecto = formulario.transecto
             clima = formulario.clima
             temporada = formulario.temporada
-            zona = formulario.zona
-            pluviosidad = formulario.pluviosidad
-            temperaturaMaxima = formulario.temperaturaMaxima
-            humedadMaxima = formulario.humedadMaxima
-            temperaturaMinima = formulario.temperaturaMinima
-            nivelQuebrada = formulario.nivelQuebrada
+            tipoAnimal = formulario.tipoAnimal
+            nombreComun = formulario.nombreComun
+            nombreCientifico = formulario.nombreCientifico
+            numeroIndividuos = formulario.numeroIndividuos
+            tipoObservacion = formulario.tipoObservacion
+            observaciones = formulario.observaciones
             fecha = formulario.fecha
             editado = formulario.editado
             location = if (formulario.latitude != null && formulario.longitude != null) {
@@ -110,7 +114,7 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
 
             // Load saved images
             val storedImages = runBlocking {
-                appContainer.formulariosRepository.getImagesByFormulario(formularioId, "Formulario7")
+                appContainer.formulariosRepository.getImagesByFormulario(formularioId, "Formulario1")
                     .first() // Fetch the list of ImageEntity for this form
             }
 
@@ -124,9 +128,11 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                 }
             }.toMutableList()
         } else {
-            Log.e("Formulario7Loading", "NO se pudo obtener el formulario7 con id $formularioId")
+            Log.e("Formulario1Loading", "NO se pudo obtener el formulario1 con id $formularioId")
         }
     }
+
+
     if(location == null){
         LaunchedEffect(Unit) {
             context.requestLocationPermission()
@@ -142,7 +148,10 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
             }
         }
     }
-    
+    // Para Room, 0 significa que no hay un id designado. Genera una nueva entrada con id auto-generado.
+    // Un valor de un id existente, reemplaza.
+
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -172,24 +181,30 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                     onClose = { showCamera = false },
                     onGalleryClick = { /* Optional: Handle gallery selection */ }
                 )
-            } else {
+            }  else {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.White)
+                   modifier = Modifier.background(color = Color.White)
                 ) {
                     Column(
                         modifier = Modifier
                             .padding(paddingValues)
                             .padding(16.dp)
                             .fillMaxSize()
-                            .verticalScroll(rememberScrollState()),
+                            .verticalScroll(rememberScrollState())
+                            .background(color = Color.White),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         location?.let { (latitude, longitude) ->
                             Text("Ubicacion Actual: Lati: $latitude, Long: $longitude")
                         } ?: Text("Buscando ubicacion...")
-                        
+
+                        OutlinedTextField(
+                            value = transecto,
+                            onValueChange = { transecto = it },
+                            label = { Text("Número de Transecto") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.fillMaxWidth()
+                        )
                         Text("Estado del Tiempo:")
                         FlowRow (
                             modifier = Modifier.fillMaxWidth(),
@@ -197,11 +212,12 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                             maxItemsInEachRow = 3
                             //verticalAlignment = Alignment.CenterVertically
                         ) {
-                            val weatherOptions = listOf("Soleado", "Parcialmente Nublado", "Lluvioso")
+                            val weatherOptions =
+                                listOf("Soleado", "Parcialmente Nublado", "Lluvioso")
                             val weatherIcons = listOf(
-                                R.drawable.sunny,
-                                R.drawable.cloudy,
-                                R.drawable.rainy
+                                R.drawable.sunny, // Add sunny icon in your drawable resources
+                                R.drawable.cloudy, // Add partly cloudy icon in your drawable resources
+                                R.drawable.rainy // Add rainy icon in your drawable resources
                             )
 
                             weatherOptions.forEachIndexed { index, option ->
@@ -249,72 +265,117 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                                 }
                             }
                         }
-                        Text("Zona")
-                        val zonasOpciones = listOf(
-                            "Bosque",
-                            "Arreglo Agroforestal",
-                            "Cultivos Transitorios",
-                            "Cultivos Permanentes"
-                        )
-                        if (zona == "") zona = zonasOpciones[0] // Default value
-                        zonasOpciones.forEach { option ->
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(
-                                    selected = zona == option,
-                                    onClick = { zona = option },
-                                    colors = RadioButtonDefaults.colors(
-                                        selectedColor = Color(0xFF4E7029),
-                                        unselectedColor = Color.Gray
-                                    )
-                                )
-                                Text(option, modifier = Modifier.padding(start = 8.dp))
+
+                        Text("Tipo de Animal")
+                        FlowRow (
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            maxItemsInEachRow = 3
+                            //verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            val animals = listOf("Mamífero", "Ave", "Reptil", "Anfibio", "Insecto")
+                            if (tipoAnimal == "") {
+                                tipoAnimal = animals[0]
+                            }
+
+                            animals.forEach { animal ->
+                                IconToggleButton(
+                                    checked = tipoAnimal == animal,
+                                    onCheckedChange = { tipoAnimal = animal },
+                                    modifier = Modifier.size(155.dp)
+                                ) {
+                                    val imageResource = when (animal) {
+                                        "Mamífero" -> R.drawable.ic_mamifero
+                                        "Ave" -> R.drawable.ic_ave
+                                        "Reptil" -> R.drawable.ic_reptil
+                                        "Anfibio" -> R.drawable.ic_anfibio
+                                        "Insecto" -> R.drawable.ic_insecto
+                                        else -> android.R.drawable.ic_menu_gallery
+                                    }
+
+                                    // Outer Box for border and padding
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(8.dp) // Space between items
+                                            .border(
+                                                width = 2.dp,
+                                                color = if (tipoAnimal == animal) Color(0xFF4E7029) else Color.Transparent, // Green border if selected
+                                                shape = androidx.compose.foundation.shape.RoundedCornerShape(
+                                                    8.dp
+                                                ) // Rounded corners
+                                            )
+                                            .padding(8.dp) // Padding inside the border
+                                    ) {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally // Center image and label
+                                        ) {
+                                            // Image with increased size
+                                            Image(
+                                                painter = painterResource(id = imageResource),
+                                                contentDescription = animal,
+                                                modifier = Modifier.requiredSize(75.dp) // Larger size for the image
+                                            )
+                                            // Label below the image
+                                            Text(
+                                                text = animal,
+                                                fontSize = 20.sp,
+                                                color = if (tipoAnimal == animal) Color(0xFF4E7029) else Color(
+                                                    0xFF3F3F3F
+                                                ), // Green if selected
+                                                modifier = Modifier.padding(top = 4.dp) // Space between image and label
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
 
-                        // Pluviosidad Field
+
                         OutlinedTextField(
-                            value = pluviosidad,
-                            onValueChange = { pluviosidad = it },
-                            label = { Text("Pluviosidad (mm)") },
+                            value = nombreComun,
+                            onValueChange = { nombreComun = it },
+                            label = { Text("Nombre Común") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        OutlinedTextField(
+                            value = nombreCientifico,
+                            onValueChange = { nombreCientifico = it },
+                            label = { Text("Nombre Científico") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        OutlinedTextField(
+                            value = numeroIndividuos,
+                            onValueChange = { numeroIndividuos = it },
+                            label = { Text("Número de Individuos") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        // Temperatura Máxima Field
-                        OutlinedTextField(
-                            value = temperaturaMaxima,
-                            onValueChange = { temperaturaMaxima = it },
-                            label = { Text("Temperatura máxima") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        Text("Tipo de Observación")
+                        val observacionOptions =
+                            listOf("La Vió", "Huella", "Rastro", "Cacería", "Le dijeron")
+                        if (tipoObservacion == "") {
+                            tipoObservacion = observacionOptions[0]
+                        }
+                        Column {
+                            observacionOptions.forEach { option ->
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    RadioButton(
+                                        selected = tipoObservacion == option,
+                                        onClick = { tipoObservacion = option },
+                                        colors = RadioButtonDefaults.colors(
+                                            selectedColor = Color(0xFF4E7029),
+                                            unselectedColor = Color.Gray
+                                        )
+                                    )
+                                    Text(option, modifier = Modifier.padding(start = 8.dp))
+                                }
+                            }
+                        }
 
-                        // Humedad Máxima Field
-                        OutlinedTextField(
-                            value = humedadMaxima,
-                            onValueChange = { humedadMaxima = it },
-                            label = { Text("Humedad máxima") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
 
-                        // Temperatura Mínima Field
-                        OutlinedTextField(
-                            value = temperaturaMinima,
-                            onValueChange = { temperaturaMinima = it },
-                            label = { Text("Temperatura mínima") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Nivel Quebrada Field
-                        OutlinedTextField(
-                            value = nivelQuebrada,
-                            onValueChange = { nivelQuebrada = it },
-                            label = { Text("Nivel Quebrada (mt)") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
                         // Camera Button
                         Button(
                             onClick = { showCamera = true },
@@ -346,21 +407,34 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                                     contentDescription = "Saved Image",
                                     modifier = Modifier.size(100.dp)
                                 )
-                                Button(onClick = {
-                                    savedImageUris.value = savedImageUris.value.toMutableList().apply { remove(uri) }
-                                },
+                                Button(
+                                    onClick = {
+                                        savedImageUris.value = savedImageUris.value.toMutableList()
+                                            .apply { remove(uri) }
+                                    },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color.Transparent // Removes background color
                                     ),
                                     elevation = null // Removes shadow/elevation for a completely flat button
                                 ) {
-                                    Text(text = "X",
+                                    Text(
+                                        text = "X",
                                         color = Color.Red,
-                                        fontSize = 20.sp)
+                                        fontSize = 20.sp
+                                    )
                                 }
                             }
                         }
-                        
+                        OutlinedTextField(
+                            value = observaciones,
+                            onValueChange = { observaciones = it },
+                            label = { Text("Observaciones") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(100.dp),
+                            maxLines = 4
+                        )
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -392,45 +466,46 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                                     }
                                     editado = getCurrentDate()
                                     val formulario =
-                                        FormularioSieteEntity(
+                                        FormularioUnoEntity(
+                                            transecto = transecto,
                                             clima = clima,
                                             temporada = temporada,
-                                            zona = zona,
-                                            pluviosidad = pluviosidad,
-                                            temperaturaMaxima = temperaturaMaxima,
-                                            humedadMaxima = humedadMaxima,
-                                            temperaturaMinima = temperaturaMinima,
-                                            nivelQuebrada = nivelQuebrada,
+                                            tipoAnimal = tipoAnimal,
+                                            nombreComun = nombreComun,
+                                            nombreCientifico = nombreCientifico,
+                                            numeroIndividuos = numeroIndividuos,
+                                            tipoObservacion = tipoObservacion,
+                                            observaciones = observaciones,
                                             latitude = location?.first,
                                             longitude = location?.second,
                                             fecha = fecha,
                                             editado = editado
                                         ).withID(formularioId)
-
+                                    // Guardar en base de datos, vinculado al usuario
                                     runBlocking {
                                         // Insert regresa su id
-                                        val formId = appContainer.usuariosRepository.insertUserWithFormularioSiete(
-                                            context.accountInfo.user_id, formulario
-                                        )
+                                        val formId =
+                                            appContainer.usuariosRepository.insertUserWithFormularioUno(
+                                                context.accountInfo.user_id, formulario
+                                            )
                                         Log.d("ImageDAO", "formId: $formId")
 
                                         // Borrar todas las fotos en ese reporte
                                         appContainer.formulariosRepository.deleteImagesByFormulario(
                                             formularioId = formId,
-                                            formularioType = "Formulario7"
+                                            formularioType = "Formulario1"
                                         )
 
                                         // Agregar todas las imagenes al reporte
                                         savedImageUris.value.forEach { uri ->
                                             val image = ImageEntity(
                                                 formularioId = formId,
-                                                formularioType = "Formulario7",
+                                                formularioType = "Formulario1",
                                                 imageUri = uri.toString()
                                             )
                                             appContainer.formulariosRepository.insertImage(image)
                                         }
                                     }
-
                                     navController.navigate("home")
                                 },
                                 colors = ButtonDefaults.buttonColors(
@@ -441,7 +516,7 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text(
-                                    "Enviar",
+                                    "Guardar",
                                     style = TextStyle(
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.SemiBold
@@ -454,4 +529,12 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
             }
         }
     )
+}
+
+fun getCurrentDate(existingDate: String? = null): String {
+    return existingDate ?: run {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val date = Date()
+        dateFormat.format(date)
+    }
 }

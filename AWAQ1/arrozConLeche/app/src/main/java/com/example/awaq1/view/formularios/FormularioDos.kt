@@ -1,4 +1,4 @@
-package com.example.awaq1.view
+package com.example.awaq1.view.formularios
 
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -44,27 +44,26 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Checkbox
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.awaq1.ViewModels.CameraViewModel
-import com.example.awaq1.data.formularios.FormularioSeisEntity
+import com.example.awaq1.data.formularios.FormularioDosEntity
 import com.example.awaq1.data.formularios.ImageEntity
 import com.example.awaq1.data.formularios.Ubicacion
-import com.google.gson.Gson
+import com.example.awaq1.view.CameraWindow
 import kotlinx.coroutines.flow.first
 
 
 @Preview(showBackground = true, showSystemUi = false)
 @Composable
-fun PreviewForm6() {
-    ObservationFormSeis(rememberNavController())
+fun PreviewForm2() {
+    ObservationFormDos(rememberNavController())
 }
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
+fun ObservationFormDos(navController: NavController, formularioId: Long = 0) {
     val context = LocalContext.current as MainActivity
     val appContainer = context.container
     var showCamera by remember { mutableStateOf(false) }
@@ -73,48 +72,35 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     val ubicacion = Ubicacion(context)
 
-    var codigo by remember { mutableStateOf("") }
+    var zona: String by remember { mutableStateOf("") }
     var clima by remember { mutableStateOf("") }
     var temporada by remember { mutableStateOf("Verano/Seca") }
-    var zona by remember { mutableStateOf("") }
-    var nombreCamara by remember { mutableStateOf("") }
-    var placaCamara by remember { mutableStateOf("") }
-    var placaGuaya by remember { mutableStateOf("") }
-    var anchoCamino by remember { mutableStateOf("") }
-    var fechaInstalacion by remember { mutableStateOf("") }
-    var distanciaObjetivo by remember { mutableStateOf("") }
-    var alturaLente by remember { mutableStateOf("") }
-    val checklistItems = listOf(
-        "Programada",
-        "Memoria",
-        "Prueba de gateo",
-        "Instalada",
-        "Letrero de cámara",
-        "Prendida"
-    )
-    val checklistState = remember { mutableStateMapOf<String, Boolean>().apply { checklistItems.forEach { put(it, false) } } }
+    var tipoAnimal: String by remember { mutableStateOf("") }
+    var nombreComun: String by remember { mutableStateOf("") }
+    var nombreCientifico: String by remember { mutableStateOf("") }
+    var numeroIndividuos: String by remember { mutableStateOf("") }
+    var tipoObservacion: String by remember { mutableStateOf("") }
+    var alturaObservacion: String by remember { mutableStateOf("") }
     var observaciones: String by remember { mutableStateOf("") }
     var fecha by remember { mutableStateOf("") }
     var editado by remember { mutableStateOf("") }
 
     if (formularioId != 0L) {
-        val formulario: FormularioSeisEntity? = runBlocking {
-            Log.d("Formulario6Loading", "Loading formulario6 with ID $formularioId")
-            appContainer.formulariosRepository.getFormularioSeisStream(formularioId).first()
+        val formulario: FormularioDosEntity? = runBlocking {
+            Log.d("Formulario2Loading", "Loading formulario2 with ID $formularioId")
+            appContainer.formulariosRepository.getFormularioDosStream(formularioId).first()
         }
 
         if (formulario != null) {
-            codigo = formulario.codigo
             zona = formulario.zona
             clima = formulario.clima
             temporada = formulario.temporada
-            nombreCamara = formulario.nombreCamara
-            placaCamara = formulario.placaCamara
-            placaGuaya = formulario.placaGuaya
-            anchoCamino = formulario.anchoCamino
-            fechaInstalacion = formulario.fechaInstalacion
-            distanciaObjetivo = formulario.distanciaObjetivo
-            alturaLente = formulario.alturaLente
+            tipoAnimal = formulario.tipoAnimal
+            nombreComun = formulario.nombreComun
+            nombreCientifico = formulario.nombreCientifico
+            numeroIndividuos = formulario.numeroIndividuos
+            tipoObservacion = formulario.tipoObservacion
+            alturaObservacion = formulario.alturaObservacion
             observaciones = formulario.observaciones
             fecha = formulario.fecha
             editado = formulario.editado
@@ -123,17 +109,10 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
             } else {
                 null
             }
-            val restoredChecklist: Map<String, Boolean> = Gson().fromJson(
-                formulario.checklist,
-                object : com.google.gson.reflect.TypeToken<Map<String, Boolean>>() {}.type // Explicitly define the type
-            )
 
-            restoredChecklist.forEach { (item, isChecked) ->
-                checklistState[item] = isChecked // No type mismatch now
-            }
             // Load saved images
             val storedImages = runBlocking {
-                appContainer.formulariosRepository.getImagesByFormulario(formularioId, "Formulario6")
+                appContainer.formulariosRepository.getImagesByFormulario(formularioId, "Formulario2")
                     .first() // Fetch the list of ImageEntity for this form
             }
 
@@ -147,7 +126,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                 }
             }.toMutableList()
         } else {
-            Log.e("Formulario6Loading", "NO se pudo obtener el formulario6 con id $formularioId")
+            Log.e("Formulario2Loading", "NO se pudo obtener el formulario2 con id $formularioId")
         }
     }
     if(location == null){
@@ -216,13 +195,31 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                             Text("Ubicacion Actual: Lati: $latitude, Long: $longitude")
                         } ?: Text("Buscando ubicacion...")
 
-                        OutlinedTextField(
-                            value = codigo,
-                            onValueChange = { codigo = it },
-                            label = { Text("Código") },
-                            modifier = Modifier.fillMaxWidth()
+                        Text("Zona")
+                        val zonasOpciones = listOf(
+                            "Bosque",
+                            "Arreglo Agroforestal",
+                            "Cultivos Transitorios",
+                            "Cultivos Permanentes"
                         )
-
+                        if (zona == "") {
+                            zona = zonasOpciones[0]
+                        }
+                        Column {
+                            zonasOpciones.forEach { option ->
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    RadioButton(
+                                        selected = zona == option,
+                                        onClick = { zona = option },
+                                        colors = RadioButtonDefaults.colors(
+                                            selectedColor = Color(0xFF4E7029),
+                                            unselectedColor = Color.Gray
+                                        )
+                                    )
+                                    Text(option, modifier = Modifier.padding(start = 8.dp))
+                                }
+                            }
+                        }
                         Text("Estado del Tiempo:")
                         FlowRow (
                             modifier = Modifier.fillMaxWidth(),
@@ -232,9 +229,9 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                         ) {
                             val weatherOptions = listOf("Soleado", "Parcialmente Nublado", "Lluvioso")
                             val weatherIcons = listOf(
-                                R.drawable.sunny,
-                                R.drawable.cloudy,
-                                R.drawable.rainy
+                                R.drawable.sunny, // Add sunny icon in your drawable resources
+                                R.drawable.cloudy, // Add partly cloudy icon in your drawable resources
+                                R.drawable.rainy // Add rainy icon in your drawable resources
                             )
 
                             weatherOptions.forEachIndexed { index, option ->
@@ -263,11 +260,9 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                             }
                         }
                         Text("Época")
-                        FlowRow (
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceAround,
-                            maxItemsInEachRow = 3
-                            //verticalAlignment = Alignment.CenterVertically
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             val seasonOptions = listOf("Verano/Seca", "Invierno/Lluviosa")
                             seasonOptions.forEach { option ->
@@ -284,22 +279,99 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                                 }
                             }
                         }
-                        Text("Zona")
-                        val zonasOpciones = listOf(
-                            "Bosque",
-                            "Arreglo Agroforestal",
-                            "Cultivos Transitorios",
-                            "Cultivos Permanentes"
+                        Text("Tipo de Animal")
+                        FlowRow (
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            maxItemsInEachRow = 3
+                            //verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            val animals = listOf("Mamífero", "Ave", "Reptil", "Anfibio", "Insecto")
+                            if (tipoAnimal == "") {
+                                tipoAnimal = animals[0]
+                            }
+                            animals.forEach { animal ->
+                                IconToggleButton(
+                                    checked = tipoAnimal == animal,
+                                    onCheckedChange = { tipoAnimal = animal },
+                                    modifier = Modifier.size(155.dp)
+                                ) {
+                                    val imageResource = when (animal) {
+                                        "Mamífero" -> R.drawable.ic_mamifero
+                                        "Ave" -> R.drawable.ic_ave
+                                        "Reptil" -> R.drawable.ic_reptil
+                                        "Anfibio" -> R.drawable.ic_anfibio
+                                        "Insecto" -> R.drawable.ic_insecto
+                                        else -> android.R.drawable.ic_menu_gallery
+                                    }
+
+                                    // Outer Box for border and padding
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(8.dp) // Space between items
+                                            .border(
+                                                width = 2.dp,
+                                                color = if (tipoAnimal == animal) Color(0xFF4E7029) else Color.Transparent, // Green border if selected
+                                                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp) // Rounded corners
+                                            )
+                                            .padding(8.dp) // Padding inside the border
+                                    ) {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally // Center image and label
+                                        ) {
+                                            // Image with increased size
+                                            Image(
+                                                painter = painterResource(id = imageResource),
+                                                contentDescription = animal,
+                                                modifier = Modifier.requiredSize(75.dp) // Larger size for the image
+                                            )
+                                            // Label below the image
+                                            Text(
+                                                text = animal,
+                                                fontSize = 20.sp,
+                                                color = if (tipoAnimal == animal) Color(0xFF4E7029) else Color(0xFF3F3F3F), // Green if selected
+                                                modifier = Modifier.padding(top = 4.dp) // Space between image and label
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        OutlinedTextField(
+                            value = nombreComun,
+                            onValueChange = { nombreComun = it },
+                            label = { Text("Nombre Común") },
+                            modifier = Modifier.fillMaxWidth()
                         )
-                        if (zona == "") {
-                            zona = zonasOpciones[0]
+
+                        OutlinedTextField(
+                            value = nombreCientifico,
+                            onValueChange = { nombreCientifico = it },
+                            label = { Text("Nombre Científico") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        OutlinedTextField(
+                            value = numeroIndividuos,
+                            onValueChange = { numeroIndividuos = it },
+                            label = { Text("Número de Individuos") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Text("Tipo de Observación")
+                        val observacionOptions =
+                            listOf("La Vió", "Huella", "Rastro", "Cacería", "Le dijeron")
+                        if (tipoObservacion == "") {
+                            tipoObservacion = observacionOptions[0]
                         }
                         Column {
-                            zonasOpciones.forEach { option ->
+                            observacionOptions.forEach { option ->
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     RadioButton(
-                                        selected = zona == option,
-                                        onClick = { zona = option },
+                                        selected = tipoObservacion == option,
+                                        onClick = { tipoObservacion = option },
                                         colors = RadioButtonDefaults.colors(
                                             selectedColor = Color(0xFF4E7029),
                                             unselectedColor = Color.Gray
@@ -309,76 +381,35 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                                 }
                             }
                         }
-                        // Nombre Cámara Field
-                        OutlinedTextField(
-                            value = nombreCamara,
-                            onValueChange = { nombreCamara = it },
-                            label = { Text("Nombre Cámara") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
 
-                        // Placa Cámara Field
-                        OutlinedTextField(
-                            value = placaCamara,
-                            onValueChange = { placaCamara = it },
-                            label = { Text("Placa Cámara") },
-                            modifier = Modifier.fillMaxWidth()
+                        Text("Altura de Observación")
+                        val alturaOptions: List<Pair<String, String>> = listOf(
+                            Pair("Baja", "<1mt"),
+                            Pair("Media", "1-3mt"),
+                            Pair("Alta", ">3mt")
                         )
-
-                        // Placa Guaya Field
-                        OutlinedTextField(
-                            value = placaGuaya,
-                            onValueChange = { placaGuaya = it },
-                            label = { Text("Placa Guaya") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Ancho Camino Field
-                        OutlinedTextField(
-                            value = anchoCamino,
-                            onValueChange = { anchoCamino = it },
-                            label = { Text("Ancho Camino mt") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Fecha de Instalación Field
-                        OutlinedTextField(
-                            value = fechaInstalacion,
-                            onValueChange = { fechaInstalacion = it },
-                            label = { Text("Fecha de Instalación") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Distancia al Objetivo Field
-                        OutlinedTextField(
-                            value = distanciaObjetivo,
-                            onValueChange = { distanciaObjetivo = it },
-                            label = { Text("Distancia al objetivo mt") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Altura del Lente Field
-                        OutlinedTextField(
-                            value = alturaLente,
-                            onValueChange = { alturaLente = it },
-                            label = { Text("Altura del lente mt") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Checklist
-                        Text("Lista de Chequeo")
-                        checklistItems.forEach { item ->
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(
-                                    checked = checklistState[item] ?: false,
-                                    onCheckedChange = { isChecked -> checklistState[item] = isChecked }
-                                )
-                                Text(item, modifier = Modifier.padding(start = 8.dp))
+                        if (alturaObservacion == "") {
+                            alturaObservacion = alturaOptions[0].first
+                        }
+                        Column {
+                            alturaOptions.forEach { option ->
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    RadioButton(
+                                        selected = alturaObservacion == option.first,
+                                        onClick = { alturaObservacion = option.first },
+                                        colors = RadioButtonDefaults.colors(
+                                            selectedColor = Color(0xFF4E7029),
+                                            unselectedColor = Color.Gray
+                                        )
+                                    )
+                                    Text(
+                                        "${option.first} ${option.second}",
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    )
+                                }
                             }
                         }
+
                         // Camera Button
                         Button(
                             onClick = { showCamera = true },
@@ -463,21 +494,17 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                                         fecha = getCurrentDate()
                                     }
                                     editado = getCurrentDate()
-                                    val checklistJson = Gson().toJson(checklistState)
                                     val formulario =
-                                        FormularioSeisEntity(
-                                            codigo = codigo,
+                                        FormularioDosEntity(
                                             zona = zona,
                                             clima = clima,
                                             temporada = temporada,
-                                            nombreCamara = nombreCamara,
-                                            placaCamara = placaCamara,
-                                            placaGuaya = placaGuaya,
-                                            anchoCamino = anchoCamino,
-                                            fechaInstalacion = fechaInstalacion,
-                                            distanciaObjetivo = distanciaObjetivo,
-                                            alturaLente = alturaLente,
-                                            checklist = checklistJson,
+                                            tipoAnimal = tipoAnimal,
+                                            nombreComun = nombreComun,
+                                            nombreCientifico = nombreCientifico,
+                                            numeroIndividuos = numeroIndividuos,
+                                            tipoObservacion = tipoObservacion,
+                                            alturaObservacion = alturaObservacion,
                                             observaciones = observaciones,
                                             latitude = location?.first,
                                             longitude = location?.second,
@@ -487,7 +514,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
 
                                     runBlocking {
                                         // Insert regresa su id
-                                        val formId = appContainer.usuariosRepository.insertUserWithFormularioSeis(
+                                        val formId = appContainer.usuariosRepository.insertUserWithFormularioDos(
                                             context.accountInfo.user_id, formulario
                                         )
                                         Log.d("ImageDAO", "formId: $formId")
@@ -495,14 +522,14 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                                         // Borrar todas las fotos en ese reporte
                                         appContainer.formulariosRepository.deleteImagesByFormulario(
                                             formularioId = formId,
-                                            formularioType = "Formulario6"
+                                            formularioType = "Formulario2"
                                         )
 
                                         // Agregar todas las imagenes al reporte
                                         savedImageUris.value.forEach { uri ->
                                             val image = ImageEntity(
                                                 formularioId = formId,
-                                                formularioType = "Formulario6",
+                                                formularioType = "Formulario2",
                                                 imageUri = uri.toString()
                                             )
                                             appContainer.formulariosRepository.insertImage(image)

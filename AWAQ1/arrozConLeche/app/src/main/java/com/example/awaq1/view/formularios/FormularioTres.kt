@@ -1,4 +1,4 @@
-package com.example.awaq1.view
+package com.example.awaq1.view.formularios
 
 import android.net.Uri
 import android.os.Build
@@ -50,6 +50,7 @@ import com.example.awaq1.ViewModels.CameraViewModel
 import com.example.awaq1.data.formularios.FormularioTresEntity
 import com.example.awaq1.data.formularios.ImageEntity
 import com.example.awaq1.data.formularios.Ubicacion
+import com.example.awaq1.view.CameraWindow
 import kotlinx.coroutines.flow.first
 
 
