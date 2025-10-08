@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.example.awaq1"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.awaq1"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -59,7 +59,7 @@ android {
         }
     }
 }
-val room_version = "2.6.1"
+
 
 dependencies {
     implementation(libs.androidx.ui.test.junit4.android)
@@ -116,6 +116,13 @@ dependencies {
     // Include the Compose BOM for Android Test dependencies
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.01"))
     implementation("androidx.compose.material:material-icons-extended")
+
+    //Camara
+    implementation("androidx.camera:camera-camera2:1.5.0")
+    implementation("androidx.camera:camera-lifecycle:1.5.0")
+    implementation("androidx.camera:camera-view:1.5.0")
+    implementation("androidx.camera:camera-core:1.5.0")
+    implementation("androidx.camera:camera-video:1.5.0")
 }
 
 configurations.all {
