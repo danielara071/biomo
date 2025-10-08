@@ -6,12 +6,13 @@ import retrofit2.http.Header
 data class AuthRequest(
     val user_email: String,
     val password: String,
-    @Header("x-api-key") val apiKey: String
+    //@Header("x-api-key") val apiKey: String
+    @Header("apikey") val apikey: String,
 )
 
 data class AuthResponse(
     val message: String,
-    val token: String
+    val token: String,
 )
 
 data class ProfileResponse(

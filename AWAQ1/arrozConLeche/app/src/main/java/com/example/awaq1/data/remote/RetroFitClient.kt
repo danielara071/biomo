@@ -7,7 +7,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "https://api.ecoranger.org/api/"
+    //private const val BASE_URL = "https://api.ecoranger.org/api/"
+    private const val BASE_URL = "http://91.98.193.75:3000/"
+
 
     fun create(tokenManager: TokenManager): AuthApiService {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
