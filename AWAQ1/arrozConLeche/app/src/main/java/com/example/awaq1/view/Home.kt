@@ -11,11 +11,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -43,14 +54,18 @@ import com.example.awaq1.data.formularios.FormularioTresEntity
 import com.example.awaq1.data.formularios.FormularioUnoEntity
 import com.example.awaq1.data.formularios.Ubicacion
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.awaq1.data.formularios.FormInfo
-import com.example.awaq1.view.components.BottomNavigationBar
-import com.example.awaq1.view.components.DisplayCard
+import com.example.awaq1.ui.theme.components.BottomNavigationBar
+import com.example.awaq1.ui.theme.components.DisplayCard
+import com.example.awaq1.ui.theme.components.searchBar
+import kotlin.collections.buildList
 
 @Composable
 fun Home(navController: NavController) {
     val context = LocalContext.current as MainActivity
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
+    var query by remember { mutableStateOf("") }
     val ubicacion = Ubicacion(context)
     if(location == null){
         LaunchedEffect(Unit) {
@@ -101,6 +116,44 @@ fun Home(navController: NavController) {
         .collectAsState(initial = emptyList())
     val count by appContainer.formulariosRepository.getAllFormulariosCount()
         .collectAsState(initial = 0)
+    val allForms = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
+        buildList{
+            addAll(forms1.map { FormInfo(it) })
+            addAll(forms2.map { FormInfo(it) })
+            addAll(forms3.map { FormInfo(it) })
+            addAll(forms4.map { FormInfo(it) })
+            addAll(forms5.map { FormInfo(it) })
+            addAll(forms6.map { FormInfo(it) })
+            addAll(forms7.map { FormInfo(it) })
+        }
+    }
+    //Mostrar solo formularios que coincidan
+
+    //Filtrar por texto
+    val filtered = remember(allForms, query) {
+        if(query.isBlank()) allForms
+        else{
+            val q = query.trim().lowercase()
+            allForms.filter { info ->
+            listOf(
+                info.tipo,
+                info.valorIdentificador,
+                info.primerTag,
+                info.primerContenido,
+                info.segundoTag,
+                info.segundoContenido,
+                info.fechaCreacion,
+                info.fechaEdicion
+            ).any{it.lowercase().contains(q)}
+            }
+        }
+
+    }
+    val userTotal = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
+        forms1.size + forms2.size + forms3.size + forms4.size + forms5.size + forms6.size + forms7.size
+    }
+    val visibleTotal = if (query.isBlank()) userTotal else filtered.size
+    val visibleList = if(query.isBlank()) allForms else filtered
 
     Scaffold(
         bottomBar = {
@@ -134,8 +187,6 @@ fun Home(navController: NavController) {
                             color = Color(0xFF4E7029),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-
-
                         )
                     }
                 }
@@ -144,25 +195,33 @@ fun Home(navController: NavController) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+
                 ) {
                     Text(
-                        text = "Dashboard",
+                        text = "TABLERO",
                         fontSize = 35.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF333333),
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        textAlign = TextAlign.Center
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
-
+                    searchBar(value = query,
+                        onValueChange = {query = it},
+                        placeholder = "Buscar Formulario")
                     // Stats Row
                     Row(
                         horizontalArrangement = Arrangement.SpaceAround,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        StatsColumn(label = "Total", count = count, color = Color.Black)
+
+
+                        StatsColumn(label = "Total", count = visibleTotal, color = Color.Black)
                     }
+
 
                     // Forms Grid
                     LazyVerticalGrid(
@@ -174,38 +233,24 @@ fun Home(navController: NavController) {
                             .padding(horizontal = 0.dp, vertical = 8.dp)
                             .fillMaxWidth()
                     ) {
-                        items(count = 1) {
-                            Spacer(modifier = Modifier.height(10.dp))
+                        if(visibleList.isEmpty()){
+                            item{
+                                Text(
+                                    text = if(query.isBlank()) "No hay formularios" else "Sin resultados para \"$query\"",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(24.dp),
+                                    textAlign = TextAlign.Center,
+                                    color = Color.Gray
+                                )
+                            }
+                        } else{
+                            items(visibleList,
+                                key = {it.formId to it.formulario //clave estable
+                                }){formInfo ->
+                                DisplayCard(navController = navController, formInfo = formInfo)
+                            }
                         }
-                        items(forms1) { form ->
-                            val formCard = FormInfo(form)
-                            DisplayCard(navController = navController, formInfo = formCard)
-                        }
-                        items(forms2) { form ->
-                            val formCard = FormInfo(form)
-                            DisplayCard(navController = navController, formInfo = formCard)
-                        }
-                        items(forms3) { form ->
-                            val formCard = FormInfo(form)
-                            DisplayCard(navController = navController, formInfo = formCard)
-                        }
-                        items(forms4) { form ->
-                            val formCard = FormInfo(form)
-                            DisplayCard(navController = navController, formInfo = formCard)
-                        }
-                        items(forms5) { form ->
-                            val formCard = FormInfo(form)
-                            DisplayCard(navController = navController, formInfo = formCard)
-                        }
-                        items(forms6) { form ->
-                            val formCard = FormInfo(form)
-                            DisplayCard(navController = navController, formInfo = formCard)
-                        }
-                        items(forms7) { form ->
-                            val formCard = FormInfo(form)
-                            DisplayCard(navController = navController, formInfo = formCard)
-                        }
-
                     }
                 }
             }
@@ -236,4 +281,26 @@ fun StatsColumn(label: String, count: Int, color: Color) {
 // | pTag: pCont   |
 // | sTag: sCont   |
 // +---------------+
+
+
+@Composable
+fun NavigationButton(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, isActive: Boolean, onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        IconButton(onClick = onClick) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = if (isActive) Color(0xFF4CAF50) else Color.Gray // Green when active, gray when inactive
+            )
+        }
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
+            color = if (isActive) Color(0xFF4CAF50) else Color.Gray // Green when active, gray when inactive
+        )
+    }
+}
 

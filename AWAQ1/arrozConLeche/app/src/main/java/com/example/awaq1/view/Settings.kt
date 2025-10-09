@@ -31,7 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.awaq1.view.components.BottomNavigationBar
+import com.example.awaq1.ui.theme.components.BottomNavigationBar
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

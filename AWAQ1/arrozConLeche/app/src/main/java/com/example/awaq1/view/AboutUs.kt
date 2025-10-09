@@ -18,7 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.awaq1.R
-import com.example.awaq1.view.components.BottomNavigationBar
+import com.example.awaq1.ui.theme.components.BottomNavigationBar
+
 
 @Composable
 fun AboutUs(navController: NavController) {
@@ -39,7 +40,7 @@ fun AboutUs(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.logo),
+                    painter = painterResource(id = R.drawable.perfil),
                     contentDescription = "Logo",
                     modifier = Modifier
                         .size(120.dp)
@@ -49,27 +50,31 @@ fun AboutUs(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Equipo Arroz Con Leche",
+                        text = "Avengerz",
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Text(
-                        text = "José Pablo Santos Quiroga",
+                        text = "Daniel",
                         modifier = Modifier.padding(vertical = 2.dp)
                     )
                     Text(
-                        text = "Gabriel Galván García",
+                        text = "Diego",
                         modifier = Modifier.padding(vertical = 2.dp)
                     )
                     Text(
-                        text = "Omar Flores García ",
+                        text = "Rosila ",
                         modifier = Modifier.padding(vertical = 2.dp)
                     )
                     Text(
-                        text = "David Martínez Muraira",
+                        text = "Myriam",
                         modifier = Modifier.padding(vertical = 2.dp)
                     )
                     Text(
-                        text = "Carlos Vázquez Treviño",
+                        text = "Alan",
+                        modifier = Modifier.padding(vertical = 2.dp)
+                    )
+                    Text(
+                        text = "Milan",
                         modifier = Modifier.padding(vertical = 2.dp)
                     )
                 }
@@ -79,7 +84,7 @@ fun AboutUs(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Correo Contacto: A00836080@tec.mx",
+                        text = "Correo Contacto: ---",
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
                 }

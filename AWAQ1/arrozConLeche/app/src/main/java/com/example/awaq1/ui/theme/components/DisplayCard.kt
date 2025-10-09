@@ -1,4 +1,4 @@
-package com.example.awaq1.view.components
+package com.example.awaq1.ui.theme.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -81,6 +81,7 @@ fun DisplayCard(
                     Text("Creado: ${formInfo.fechaCreacion}")
                 }
             }
+            //Columna derecha
             Column(horizontalAlignment = Alignment.End){
                 Text("${formInfo.primerTag}: ${formInfo.primerContenido}" )
                 Text("${formInfo.segundoTag}: ${formInfo.segundoContenido}")

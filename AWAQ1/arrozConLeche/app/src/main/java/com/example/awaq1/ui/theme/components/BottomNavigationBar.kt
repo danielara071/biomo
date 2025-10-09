@@ -1,4 +1,4 @@
-package com.example.awaq1.view.components
+package com.example.awaq1.ui.theme.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,17 +16,15 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.awaq1.view.NavigationButton
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -88,26 +86,5 @@ fun BottomNavigationBar(navController: NavController) {
             )
         }
         Spacer(modifier = Modifier.height(45.dp))
-    }
-}
-
-@Composable
-fun NavigationButton(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, isActive: Boolean, onClick: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        IconButton(onClick = onClick) {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                tint = if (isActive) Color(0xFF4CAF50) else Color.Gray // Green when active, gray when inactive
-            )
-        }
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-            color = if (isActive) Color(0xFF4CAF50) else Color.Gray // Green when active, gray when inactive
-        )
     }
 }

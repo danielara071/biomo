@@ -26,10 +26,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
@@ -121,7 +123,7 @@ fun SelectFormularioScreen(navController: NavController) {
                 .size(36.dp)
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                imageVector = Icons.Default.Home,
                 contentDescription = "Volver",
                 modifier = Modifier.size(24.dp) // keep some padding inside the circle
             )
@@ -211,7 +213,7 @@ fun SelectFormularioScreen(navController: NavController) {
                 }
 
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 FormChooseButton(FormUnoID(), "Fauna en Transectos", navController)
                 FormChooseButton(FormDosID(), "Fauna en Punto de Conteo", navController)
                 FormChooseButton(FormTresID(), "Validación de Cobertura", navController)
