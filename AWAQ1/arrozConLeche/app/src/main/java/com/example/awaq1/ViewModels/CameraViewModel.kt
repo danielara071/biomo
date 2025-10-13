@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import android.net.Uri
 import android.util.Log
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture.ERROR_CAPTURE_FAILED
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -79,7 +80,7 @@ class CameraViewModel : ViewModel() {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                     outputFileResults.savedUri?.let { uri ->
                         onImageSaved(uri) // Pass the URI to the callback
-                    } ?: onError(ImageCaptureException(0, "URI is null", null))
+                    } ?: onError(ImageCaptureException(ERROR_CAPTURE_FAILED, "URI is null", null))
                 }
 
                 override fun onError(exception: ImageCaptureException) {

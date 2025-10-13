@@ -149,6 +149,7 @@ fun Home(navController: NavController) {
         }
 
     }
+    //Formularios totales por usuario
     val userTotal = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
         forms1.size + forms2.size + forms3.size + forms4.size + forms5.size + forms6.size + forms7.size
     }
@@ -200,7 +201,7 @@ fun Home(navController: NavController) {
 
                 ) {
                     Text(
-                        text = "TABLERO",
+                        text = "DASHBOARD",
                         fontSize = 35.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF333333),
@@ -274,13 +275,6 @@ fun StatsColumn(label: String, count: Int, color: Color) {
         )
     }
 }
-
-// Se ve algo así
-// +---------------+
-// | tipo:valorId  |
-// | pTag: pCont   |
-// | sTag: sCont   |
-// +---------------+
 
 
 @Composable
