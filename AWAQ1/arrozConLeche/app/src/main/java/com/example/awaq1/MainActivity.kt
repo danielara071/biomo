@@ -18,26 +18,32 @@ import com.auth0.android.Auth0
 import com.example.awaq1.data.AccountInfo
 import com.example.awaq1.data.AppContainer
 import com.example.awaq1.data.AppDataContainer
+import com.example.awaq1.data.remote.RetrofitClient
 import com.example.awaq1.data.formularios.Ubicacion
+import com.example.awaq1.data.local.TokenManager
+import com.example.awaq1.data.remote.AuthRepository
 import com.example.awaq1.ui.theme.AWAQ1Theme
 import com.example.awaq1.view.PrincipalView
 
 
 class MainActivity : ComponentActivity() {
     lateinit var container: AppContainer
-    private lateinit var account: Auth0
     lateinit var accountInfo: AccountInfo
+
+
+
     private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         container = AppDataContainer(this)
 
+        val tokenManager = TokenManager(applicationContext)
+        val apiService = RetrofitClient.create(tokenManager)
+        val authRepository = AuthRepository(apiService, tokenManager)
 
-        account = Auth0.getInstance(
-            getString(R.string.com_auth0_client_id),
-            getString(R.string.com_auth0_domain)
-        )
+
+
 
         locationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -55,7 +61,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AWAQ1Theme {
-                PrincipalView(modifier = Modifier, account)
+                PrincipalView(modifier = Modifier, authRepository = authRepository)
             }
         }
     }

@@ -117,12 +117,18 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.01"))
     implementation("androidx.compose.material:material-icons-extended")
 
-    //Camara
-    implementation("androidx.camera:camera-camera2:1.5.0")
-    implementation("androidx.camera:camera-lifecycle:1.5.0")
-    implementation("androidx.camera:camera-view:1.5.0")
-    implementation("androidx.camera:camera-core:1.5.0")
-    implementation("androidx.camera:camera-video:1.5.0")
+    // Retrofit & OkHttp
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+
+    // Jetpack DataStore para guardar el token de forma segura
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+
+
 }
 
 configurations.all {
