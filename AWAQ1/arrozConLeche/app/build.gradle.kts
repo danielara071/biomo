@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.example.awaq1"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.awaq1"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -59,7 +59,7 @@ android {
         }
     }
 }
-val room_version = "2.6.1"
+
 
 dependencies {
     implementation(libs.androidx.ui.test.junit4.android)

@@ -2,7 +2,6 @@ package com.example.awaq1.view
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,15 +15,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.materialIcon
-import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.material.icons.rounded.Warning
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,9 +38,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -52,19 +53,19 @@ import com.example.awaq1.data.formularios.FormularioSieteEntity
 import com.example.awaq1.data.formularios.FormularioTresEntity
 import com.example.awaq1.data.formularios.FormularioUnoEntity
 import com.example.awaq1.data.formularios.Ubicacion
-import com.example.awaq1.navigator.FormCincoID
-import com.example.awaq1.navigator.FormCuatroID
-import com.example.awaq1.navigator.FormDosID
-import com.example.awaq1.navigator.FormSeisID
-import com.example.awaq1.navigator.FormSieteID
-import com.example.awaq1.navigator.FormTresID
-import com.example.awaq1.navigator.FormUnoID
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.awaq1.data.formularios.FormInfo
+import com.example.awaq1.ui.theme.components.BottomNavigationBar
+import com.example.awaq1.ui.theme.components.DisplayCard
+import com.example.awaq1.ui.theme.components.searchBar
+import kotlin.collections.buildList
 
 @Composable
 fun Home(navController: NavController) {
     val context = LocalContext.current as MainActivity
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
+    var query by remember { mutableStateOf("") }
     val ubicacion = Ubicacion(context)
     if(location == null){
         LaunchedEffect(Unit) {
@@ -115,6 +116,45 @@ fun Home(navController: NavController) {
         .collectAsState(initial = emptyList())
     val count by appContainer.formulariosRepository.getAllFormulariosCount()
         .collectAsState(initial = 0)
+    val allForms = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
+        buildList{
+            addAll(forms1.map { FormInfo(it) })
+            addAll(forms2.map { FormInfo(it) })
+            addAll(forms3.map { FormInfo(it) })
+            addAll(forms4.map { FormInfo(it) })
+            addAll(forms5.map { FormInfo(it) })
+            addAll(forms6.map { FormInfo(it) })
+            addAll(forms7.map { FormInfo(it) })
+        }
+    }
+    //Mostrar solo formularios que coincidan
+
+    //Filtrar por texto
+    val filtered = remember(allForms, query) {
+        if(query.isBlank()) allForms
+        else{
+            val q = query.trim().lowercase()
+            allForms.filter { info ->
+            listOf(
+                info.tipo,
+                info.valorIdentificador,
+                info.primerTag,
+                info.primerContenido,
+                info.segundoTag,
+                info.segundoContenido,
+                info.fechaCreacion,
+                info.fechaEdicion
+            ).any{it.lowercase().contains(q)}
+            }
+        }
+
+    }
+    //Formularios totales por usuario
+    val userTotal = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
+        forms1.size + forms2.size + forms3.size + forms4.size + forms5.size + forms6.size + forms7.size
+    }
+    val visibleTotal = if (query.isBlank()) userTotal else filtered.size
+    val visibleList = if(query.isBlank()) allForms else filtered
 
     Scaffold(
         bottomBar = {
@@ -148,8 +188,6 @@ fun Home(navController: NavController) {
                             color = Color(0xFF4E7029),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-
-
                         )
                     }
                 }
@@ -158,25 +196,33 @@ fun Home(navController: NavController) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+
                 ) {
                     Text(
-                        text = "Dashboard",
+                        text = "DASHBOARD",
                         fontSize = 35.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF333333),
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        textAlign = TextAlign.Center
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
-
+                    searchBar(value = query,
+                        onValueChange = {query = it},
+                        placeholder = "Buscar Formulario")
                     // Stats Row
                     Row(
                         horizontalArrangement = Arrangement.SpaceAround,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        StatsColumn(label = "Total", count = count, color = Color.Black)
+
+
+                        StatsColumn(label = "Total", count = visibleTotal, color = Color.Black)
                     }
+
 
                     // Forms Grid
                     LazyVerticalGrid(
@@ -188,38 +234,24 @@ fun Home(navController: NavController) {
                             .padding(horizontal = 0.dp, vertical = 8.dp)
                             .fillMaxWidth()
                     ) {
-                        items(count = 1) {
-                            Spacer(modifier = Modifier.height(10.dp))
+                        if(visibleList.isEmpty()){
+                            item{
+                                Text(
+                                    text = if(query.isBlank()) "No hay formularios" else "Sin resultados para \"$query\"",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(24.dp),
+                                    textAlign = TextAlign.Center,
+                                    color = Color.Gray
+                                )
+                            }
+                        } else{
+                            items(visibleList,
+                                key = {it.formId to it.formulario //clave estable
+                                }){formInfo ->
+                                DisplayCard(navController = navController, formInfo = formInfo)
+                            }
                         }
-                        items(forms1) { form ->
-                            val formCard = FormInfo(form)
-                            formCard.DisplayCard(navController)
-                        }
-                        items(forms2) { form ->
-                            val formCard = FormInfo(form)
-                            formCard.DisplayCard(navController)
-                        }
-                        items(forms3) { form ->
-                            val formCard = FormInfo(form)
-                            formCard.DisplayCard(navController)
-                        }
-                        items(forms4) { form ->
-                            val formCard = FormInfo(form)
-                            formCard.DisplayCard(navController)
-                        }
-                        items(forms5) { form ->
-                            val formCard = FormInfo(form)
-                            formCard.DisplayCard(navController)
-                        }
-                        items(forms6) { form ->
-                            val formCard = FormInfo(form)
-                            formCard.DisplayCard(navController)
-                        }
-                        items(forms7) { form ->
-                            val formCard = FormInfo(form)
-                            formCard.DisplayCard(navController)
-                        }
-
                     }
                 }
             }
@@ -244,185 +276,25 @@ fun StatsColumn(label: String, count: Int, color: Color) {
     }
 }
 
-// Se ve algo así
-// +---------------+
-// | tipo:valorId  |
-// | pTag: pCont   |
-// | sTag: sCont   |
-// +---------------+
 
-data class FormInfo(
-    val tipo: String, // Descripcion del tipo de formulario (una sola palabra)
-    val valorIdentificador: String, // Valor que se muestra junto tipo
-    val primerTag: String, // Tag del primer valor a mostrar como preview del formulario
-    val primerContenido: String, // El valor a mostrar junto al primer tag
-    val segundoTag: String,
-    val segundoContenido: String,
-
-    val formulario: String, // Indicador de tipo de formulario, para luego acceder
-    val formId: Long,
-    val fechaCreacion: String,
-    val fechaEdicion: String,
-    val completo: Boolean
-) {
-    constructor(formulario: FormularioUnoEntity) : this(
-        tipo = "Transecto", formulario.transecto,
-        primerTag = "Tipo", formulario.tipoAnimal,
-        segundoTag = "Nombre", formulario.nombreComun,
-        formulario = "form1",
-        formId = formulario.id,
-        fechaCreacion = formulario.fecha,
-        fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
-    )
-
-    constructor(formulario: FormularioDosEntity) : this(
-        tipo = "Zona", formulario.zona,
-        primerTag = "Tipo", formulario.tipoAnimal,
-        segundoTag = "Nombre", formulario.nombreComun,
-        formulario = "form2",
-        formId = formulario.id,
-        fechaCreacion = formulario.fecha,
-        fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
-    )
-
-    constructor(formulario: FormularioTresEntity) : this(
-        tipo = "Código", formulario.codigo,
-        primerTag = "Seguimiento", siONo(formulario.seguimiento),
-        segundoTag = "Cambio", siONo(formulario.cambio),
-        formulario = "form3",
-        formId = formulario.id,
-        fechaCreacion = formulario.fecha,
-        fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
-    )
-
-    constructor(formulario: FormularioCuatroEntity) : this(
-        tipo = "Código", formulario.codigo,
-        primerTag = "Cuad. A", formulario.quad_a,
-        segundoTag = "Cuad. B", formulario.quad_b,
-        formulario = "form4",
-        formId = formulario.id,
-        fechaCreacion = formulario.fecha,
-        fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
-    )
-
-    constructor(formulario: FormularioCincoEntity) : this(
-        tipo = "Zona", formulario.zona,
-        primerTag = "Tipo", formulario.tipoAnimal,
-        segundoTag = "Nombre", formulario.nombreComun,
-        formulario = "form5",
-        formId = formulario.id,
-        fechaCreacion = formulario.fecha,
-        fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
-    )
-
-    constructor(formulario: FormularioSeisEntity) : this(
-        tipo = "Codigo", formulario.codigo,
-        primerTag = "Zona", formulario.zona,
-        segundoTag = "PlacaCamara", formulario.placaCamara,
-        formulario = "form6",
-        formId = formulario.id,
-        fechaCreacion = formulario.fecha,
-        fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
-    )
-
-    constructor(formulario: FormularioSieteEntity) : this(
-        tipo = "Zona", formulario.zona,
-        primerTag = "Pluviosidad", formulario.pluviosidad,
-        segundoTag = "TempMax", formulario.temperaturaMaxima,
-        formulario = "form7",
-        formId = formulario.id,
-        fechaCreacion = formulario.fecha,
-        fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
-    )
-
-    fun goEditFormulario(navController: NavController) {
-        Log.d("HOME_CLICK_ACTION", "Click en $this")
-        when (formulario) {
-            "form1" -> navController.navigate(route = FormUnoID(formId))
-            "form2" -> navController.navigate(route = FormDosID(formId))
-            "form3" -> navController.navigate(route = FormTresID(formId))
-            "form4" -> navController.navigate(route = FormCuatroID(formId))
-            "form5" -> navController.navigate(route = FormCincoID(formId))
-            "form6" -> navController.navigate(route = FormSeisID(formId))
-            "form7" -> navController.navigate(route = FormSieteID(formId))
-            else -> throw Exception("CARD NAVIGATION NOT IMPLEMENTED FOR $formulario")
+@Composable
+fun NavigationButton(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, isActive: Boolean, onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        IconButton(onClick = onClick) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = if (isActive) Color(0xFF4CAF50) else Color.Gray // Green when active, gray when inactive
+            )
         }
-    }
-
-    @Composable
-    fun DisplayCard(navController: NavController, modifier: Modifier = Modifier) {
-        Card(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding()
-                .clickable { this.goEditFormulario(navController) },
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 4.dp
-            ),
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(20.dp)
-                    .fillMaxWidth()
-                    .padding(end = 40.dp),
-                Arrangement.SpaceBetween
-
-            ) {
-                Column {
-                    Text(
-                        text = "$tipo: $valorIdentificador",
-                        fontSize = 25.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-
-                    Row {
-                        if (completo) {
-                            Icon(
-                                imageVector = Icons.Rounded.CheckCircle,
-                                contentDescription = null,
-                                tint = Color.Green
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Rounded.Warning,
-                                contentDescription = null,
-                                tint = Color(237, 145, 33)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.size(10.dp, 10.dp))
-                        Text("Creado: $fechaCreacion")
-                    }
-                }
-                Column {
-                    Text(
-                        text = "$primerTag: $primerContenido",
-                        fontSize = 25.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Black
-                    )
-
-                    Text(
-                        text = "$segundoTag: $segundoContenido",
-                        fontSize = 25.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Black
-                    )
-                }
-            }
-        }
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
+            color = if (isActive) Color(0xFF4CAF50) else Color.Gray // Green when active, gray when inactive
+        )
     }
 }
 
-private fun siONo(boolean: Boolean): String = if (boolean) "Sí" else "No"

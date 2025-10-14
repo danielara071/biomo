@@ -3,12 +3,16 @@ package com.example.awaq1.view
 import android.graphics.Paint.Align
 import android.os.Build
 import android.widget.Button
+import android.widget.RadioButton
 import android.widget.Space
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -22,10 +26,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
@@ -74,13 +80,14 @@ import com.example.awaq1.navigator.FormSieteID
 import com.example.awaq1.navigator.FormTresID
 import com.example.awaq1.navigator.FormUnoID
 
+
 @Preview(showBackground = true, showSystemUi = false)
 @Composable
 fun PreviewSelectFormulario() {
     SelectFormularioScreen(rememberNavController())
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SelectFormularioScreen(navController: NavController) {
     var pais by remember { mutableStateOf("") }
@@ -116,12 +123,13 @@ fun SelectFormularioScreen(navController: NavController) {
                 .size(36.dp)
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                imageVector = Icons.Default.Home,
                 contentDescription = "Volver",
                 modifier = Modifier.size(24.dp) // keep some padding inside the circle
             )
         }
         }
+
     ) { paddingValues ->
         Box(
             modifier = Modifier.fillMaxSize()
@@ -164,32 +172,48 @@ fun SelectFormularioScreen(navController: NavController) {
                 )
 
                 Text("Zona")
-                val zonasOpciones = listOf(
-                    "Vereda",
-                    "Finca",
-                    "Río",
-                    "Quebrada"
-                )
-                if (zona == "") {
-                    zona = zonasOpciones[0]
-                }
-                Column {
+                FlowRow(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    maxItemsInEachRow = 2
+                ) {
+                    val zonasOpciones = listOf(
+                        "Vereda",
+                        "Finca",
+                        "Río",
+                        "Quebrada"
+                    )
                     zonasOpciones.forEach { option ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(
+                                    if (zona == option) Color(0xFFE4F1D4) else Color.Transparent
+                                )
+                                .padding(horizontal = 12.dp, vertical = 4.dp)
+                        ) {
                             RadioButton(
                                 selected = zona == option,
-                                onClick = { zona = option },
+                                onClick = {zona = option},
                                 colors = RadioButtonDefaults.colors(
                                     selectedColor = Color(0xFF4E7029),
                                     unselectedColor = Color.Gray
                                 )
                             )
-                            Text(option, modifier = Modifier.padding(start = 8.dp))
+                            Text(
+                                text = option,
+                                modifier = Modifier.padding(start = 6.dp),
+                                fontSize = 18.sp,
+                                fontWeight = if(zona == option ) FontWeight.SemiBold else FontWeight.Normal,
+                                color = if(zona == option) Color(0xFF4E7029) else Color(0xFF3F3F3F)
+                            )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+
+                Spacer(modifier = Modifier.height(8.dp))
                 FormChooseButton(FormUnoID(), "Fauna en Transectos", navController)
                 FormChooseButton(FormDosID(), "Fauna en Punto de Conteo", navController)
                 FormChooseButton(FormTresID(), "Validación de Cobertura", navController)

@@ -1,4 +1,4 @@
-package com.example.awaq1.view
+package com.example.awaq1.view.formularios
 
 import android.net.Uri
 import android.os.Build
@@ -43,8 +43,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.IconToggleButton
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -52,9 +50,9 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.awaq1.R
 import com.example.awaq1.ViewModels.CameraViewModel
 import com.example.awaq1.data.formularios.FormularioCuatroEntity
-import com.example.awaq1.data.formularios.FormularioTresEntity
 import com.example.awaq1.data.formularios.ImageEntity
 import com.example.awaq1.data.formularios.Ubicacion
+import com.example.awaq1.view.CameraWindow
 import kotlinx.coroutines.flow.first
 
 @Preview(showBackground = true, showSystemUi = true)

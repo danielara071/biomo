@@ -38,4 +38,4 @@ replay_pid*
 .cxx
 local.properties
 /app/build
-/app/src/main/res/values/secrets.xml
+**/secrets.xml
