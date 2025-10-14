@@ -6,7 +6,6 @@ import retrofit2.http.Header
 data class AuthRequest(
     val user_email: String,
     val password: String,
-//    val apiKey: String  // Remove @Header annotation
 )
 
 data class AuthResponse(

@@ -7,10 +7,10 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface AuthApiService {
-    @POST("biomo/users/login")
+    @POST("api/biomo/users/login")
     suspend fun signIn(@Body authRequest: AuthRequest): Response<AuthResponse>
 
-    @GET("api/profile")
+    @GET("api/biomo/profile")
     suspend fun getProfile(): Response<ProfileResponse>
 
     @POST("biomo/users/logout")

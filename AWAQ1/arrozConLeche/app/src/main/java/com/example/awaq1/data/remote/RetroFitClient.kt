@@ -11,14 +11,16 @@ import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "https://api.ecoranger.org/api/"
+    private const val BASE_URL = "https://ekgcss8ww8o4ok480g08soo4.91.98.193.75.sslip.io/"
+
+    //private const val BASE_URL = "http://91.98.193.75:3000/biomo/"
 
     fun create(tokenManager: TokenManager): AuthApiService {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        // Explicit Dns implementation
+
         val ipv4Dns = object : Dns {
             override fun lookup(hostname: String): List<InetAddress> {
                 return InetAddress.getAllByName(hostname).filter { it is Inet4Address }

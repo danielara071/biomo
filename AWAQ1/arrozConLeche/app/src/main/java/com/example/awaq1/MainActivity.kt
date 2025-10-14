@@ -28,7 +28,6 @@ import com.example.awaq1.view.PrincipalView
 
 class MainActivity : ComponentActivity() {
     lateinit var container: AppContainer
-    private lateinit var account: Auth0
     lateinit var accountInfo: AccountInfo
 
 
@@ -44,10 +43,7 @@ class MainActivity : ComponentActivity() {
         val authRepository = AuthRepository(apiService, tokenManager)
 
 
-        account = Auth0.getInstance(
-            getString(R.string.com_auth0_client_id),
-            getString(R.string.com_auth0_domain)
-        )
+
 
         locationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()

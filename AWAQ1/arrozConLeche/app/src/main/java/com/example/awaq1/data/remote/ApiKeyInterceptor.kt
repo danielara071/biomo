@@ -5,7 +5,7 @@ import okhttp3.Response
 class ApiKeyInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val newRequest = chain.request().newBuilder()
-            .addHeader("x-api-key", "biomo-key-456")
+            .addHeader("apikey", "biomo-key-456")
             .addHeader("accept", "application/json")
             .build()
         return chain.proceed(newRequest)
