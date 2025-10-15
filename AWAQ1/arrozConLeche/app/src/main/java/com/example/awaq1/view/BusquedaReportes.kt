@@ -1,6 +1,4 @@
 package com.example.awaq1.view
-
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,29 +6,46 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.awaq1.MainActivity
 import com.example.awaq1.R
-import com.example.awaq1.data.formularios.FormularioUnoEntity
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
+import com.example.awaq1.data.formularios.FormInfo
 import com.example.awaq1.ui.theme.components.BottomNavigationBar
+import com.example.awaq1.ui.theme.components.DisplayCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ObservationListScreen(navController: NavController) {
     val context = LocalContext.current as MainActivity
-    val appContainer = context.container
-    val formsList: List<FormularioUnoEntity> by appContainer.formulariosRepository.getAllFormularioUnosStream()
-        .collectAsState(initial = emptyList())
+    val userId = context.accountInfo.user_id
+    val repo = context.container.usuariosRepository
+    //Cargar SOLO formularios del usuario en sesión
+    val forms1 by repo.getAllFormularioUnoForUserID(userId).collectAsState(initial = emptyList())
+    val forms2 by repo.getAllFormularioDosForUserID(userId).collectAsState(initial = emptyList())
+    val forms3 by repo.getAllFormularioTresForUserID(userId).collectAsState(initial = emptyList())
+    val forms4 by repo.getAllFormularioCuatroForUserID(userId).collectAsState(initial = emptyList())
+    val forms5 by repo.getAllFormularioCincoForUserID(userId).collectAsState(initial = emptyList())
+    val forms6 by repo.getAllFormularioSeisForUserID(userId).collectAsState(initial = emptyList())
+    val forms7 by repo.getAllFormularioSieteForUserID(userId).collectAsState(initial = emptyList())
+
+    //Unificar a un solo listado común
+    val allForms = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
+        buildList {
+            addAll(forms1.map(::FormInfo))
+            addAll(forms2.map(::FormInfo))
+            addAll(forms3.map(::FormInfo))
+            addAll(forms4.map(::FormInfo))
+            addAll(forms5.map(::FormInfo))
+            addAll(forms6.map(::FormInfo))
+            addAll(forms7.map(::FormInfo))
+        }
+    }
 
     var completoSelected by remember { mutableStateOf(false) }
     var incompletoSelected by remember { mutableStateOf(false) }
@@ -61,13 +76,6 @@ fun ObservationListScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.background),
-                contentDescription = "Background",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.FillBounds
-            )
-
             Column {
                 Row(
                     modifier = Modifier
@@ -103,46 +111,8 @@ fun ObservationListScreen(navController: NavController) {
                         .padding(16.dp)
                         .fillMaxSize()
                 ) {
-                    items(formsList) { form ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .clickable {
-                                    // navController.navigate("formDetail/${formsList.}")
-                                },
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color.White  // Color de fondo blanco
-                            ),
-                            elevation = CardDefaults.cardElevation(
-                                defaultElevation = 4.dp  // Añade un poco de elevación para mejor contraste
-                            )
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Text(
-                                    text = "Transecto: ${form.transecto}",
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    color = Color.Black  // Texto negro para mejor contraste
-                                )
-                                Text(
-                                    text = "Tipo de Animal: ${form.tipoAnimal}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = "Nombre Común: ${form.nombreComun}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = "Observaciones: ${form.observaciones}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.Black
-                                )
-                            }
-                        }
+                    items(allForms) { form ->
+                        DisplayCard(navController = navController , formInfo = form)
                     }
                 }
             }
