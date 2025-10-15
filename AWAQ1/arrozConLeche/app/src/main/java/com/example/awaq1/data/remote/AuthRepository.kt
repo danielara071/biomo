@@ -16,14 +16,6 @@ class AuthRepository(
             throw Exception("Credenciales inválidas o error del servidor.")
         }
     }
-    /*suspend fun signUp(email: String, password: String) {
-        val response = apiService.signUp(AuthRequest(email, password))
-        if (!response.isSuccessful) {
-            // Maneja el error, por ejemplo, si el usuario ya existe
-            throw Exception("El registro falló: ${response.message()}")
-        }
-    }
-*/
     suspend fun signOut() {
         tokenManager.deleteToken()
     }

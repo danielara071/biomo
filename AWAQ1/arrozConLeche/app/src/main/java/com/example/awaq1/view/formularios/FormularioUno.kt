@@ -52,6 +52,7 @@ import com.example.awaq1.data.formularios.ImageEntity
 import com.example.awaq1.data.formularios.Ubicacion
 import com.example.awaq1.view.CameraWindow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -72,6 +73,7 @@ fun ObservationForm(navController: NavController, formularioId: Long = 0L) {
 
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     val ubicacion = Ubicacion(context)
+    val scope = rememberCoroutineScope()
 
     var transecto by remember { mutableStateOf("") }
     var clima by remember { mutableStateOf("") }
@@ -481,14 +483,32 @@ fun ObservationForm(navController: NavController, formularioId: Long = 0L) {
                                             fecha = fecha,
                                             editado = editado
                                         ).withID(formularioId)
+
+
                                     // Guardar en base de datos, vinculado al usuario
-                                    runBlocking {
-                                        // Insert regresa su id
-                                        val formId =
-                                            appContainer.usuariosRepository.insertUserWithFormularioUno(
-                                                context.accountInfo.user_id, formulario
+                                    scope.launch {
+                                        // 1) Guardar LOCAL (offline-first)
+                                        val formId = appContainer.usuariosRepository
+                                            .insertUserWithFormularioUno(context.accountInfo.user_id, formulario)
+
+                                        // Limpia y vuelve a guardar imágenes asociadas a este form
+                                        appContainer.formulariosRepository.deleteImagesByFormulario(
+                                            formularioId = formId,
+                                            formularioType = "Formulario1"
+                                        )
+                                        savedImageUris.value.forEach { uri ->
+                                            appContainer.formulariosRepository.insertImage(
+                                                ImageEntity(
+                                                    formularioId = formId,
+                                                    formularioType = "Formulario1",
+                                                    imageUri = uri.toString()
+                                                )
                                             )
+                                        }
                                         Log.d("ImageDAO", "formId: $formId")
+
+                                        //Envio a Base de datos remota
+                                        appContainer.formulariosRemoteRepository.enviarFormularioUno(formulario)
 
                                         // Borrar todas las fotos en ese reporte
                                         appContainer.formulariosRepository.deleteImagesByFormulario(

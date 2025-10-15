@@ -13,6 +13,10 @@ data class AuthResponse(
     val token: String,
 )
 
+data class FormularioResponse(
+    val message: String,
+)
+
 data class ProfileResponse(
     val message: String,
     val user: User

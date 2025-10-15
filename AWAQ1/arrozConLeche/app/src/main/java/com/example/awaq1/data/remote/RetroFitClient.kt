@@ -1,6 +1,10 @@
 package com.example.awaq1.data.remote
 
+import androidx.room.PrimaryKey
 import com.example.awaq1.data.local.TokenManager
+import com.google.gson.ExclusionStrategy
+import com.google.gson.FieldAttributes
+import com.google.gson.GsonBuilder
 import okhttp3.Dns
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -36,10 +40,22 @@ object RetrofitClient {
             .readTimeout(30, TimeUnit.SECONDS)
             .build()
 
+        val gson = GsonBuilder()
+            .addSerializationExclusionStrategy(object : ExclusionStrategy {
+                override fun shouldSkipField(f: FieldAttributes): Boolean {
+                    // Evita enviar ids locales a la API
+                    val isPrimaryKey = f.getAnnotation(PrimaryKey::class.java) != null
+                    val isIdByName = f.name == "id"
+                    return isPrimaryKey || isIdByName
+                }
+                override fun shouldSkipClass(clazz: Class<*>) = false
+            })
+            .create()
+
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 
         return retrofit.create(AuthApiService::class.java)

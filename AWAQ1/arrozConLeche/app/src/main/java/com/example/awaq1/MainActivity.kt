@@ -14,7 +14,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.auth0.android.Auth0
 import com.example.awaq1.data.AccountInfo
 import com.example.awaq1.data.AppContainer
 import com.example.awaq1.data.AppDataContainer
@@ -41,6 +40,7 @@ class MainActivity : ComponentActivity() {
         val tokenManager = TokenManager(applicationContext)
         val apiService = RetrofitClient.create(tokenManager)
         val authRepository = AuthRepository(apiService, tokenManager)
+
 
 
 

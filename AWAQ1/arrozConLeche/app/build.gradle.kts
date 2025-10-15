@@ -128,6 +128,13 @@ dependencies {
     // Jetpack DataStore para guardar el token de forma segura
     implementation("androidx.datastore:datastore-preferences:1.1.7")
 
+    //Camara
+    implementation("androidx.camera:camera-camera2:1.5.0")
+    implementation("androidx.camera:camera-lifecycle:1.5.0")
+    implementation("androidx.camera:camera-view:1.5.0")
+    implementation("androidx.camera:camera-core:1.5.0")
+    implementation("androidx.camera:camera-video:1.5.0")
+
 
 }
 

@@ -2,6 +2,7 @@ package com.example.awaq1.data.formularios
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -13,11 +14,11 @@ data class FormularioUnoEntity(
     var transecto: String,
     var clima: String,
     var temporada: String,
-    var tipoAnimal: String,
-    var nombreComun: String,
-    var nombreCientifico: String,
-    var numeroIndividuos: String,
-    var tipoObservacion: String,
+    @SerializedName("tipoanimal")val tipoAnimal: String,
+    @SerializedName("nombrecomun") var nombreComun: String,
+    @SerializedName("nombrecientifico")var nombreCientifico: String,
+    @SerializedName("numeroindividuos")var numeroIndividuos: String,
+    @SerializedName("tipoobservacion")var tipoObservacion: String,
     var observaciones: String,
     val latitude: Double? = null,
     val longitude: Double? = null,
