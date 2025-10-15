@@ -54,15 +54,18 @@ import com.example.awaq1.data.formularios.FormularioTresEntity
 import com.example.awaq1.data.formularios.FormularioUnoEntity
 import com.example.awaq1.data.formularios.Ubicacion
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.min
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.awaq1.data.formularios.FormInfo
 import com.example.awaq1.ui.theme.components.BottomNavigationBar
 import com.example.awaq1.ui.theme.components.DisplayCard
 import com.example.awaq1.ui.theme.components.searchBar
 import kotlin.collections.buildList
-
 @Composable
-fun Home(navController: NavController) {
+fun Home(navController: NavController)
+ {
     val context = LocalContext.current as MainActivity
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     var query by remember { mutableStateOf("") }
@@ -114,8 +117,7 @@ fun Home(navController: NavController) {
         context.accountInfo.user_id
     )
         .collectAsState(initial = emptyList())
-    val count by appContainer.formulariosRepository.getAllFormulariosCount()
-        .collectAsState(initial = 0)
+
     val allForms = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
         buildList{
             addAll(forms1.map { FormInfo(it) })
@@ -128,7 +130,6 @@ fun Home(navController: NavController) {
         }
     }
     //Mostrar solo formularios que coincidan
-
     //Filtrar por texto
     val filtered = remember(allForms, query) {
         if(query.isBlank()) allForms
@@ -158,7 +159,7 @@ fun Home(navController: NavController) {
 
     Scaffold(
         bottomBar = {
-            Column() {
+            Column {
                 BottomNavigationBar(navController)
             }
         },
@@ -173,17 +174,25 @@ fun Home(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp)
-                        .clip(RoundedCornerShape(bottomStart = 2000.dp, bottomEnd = 2000.dp))
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(bottomStart = 1000.dp, bottomEnd = 1000.dp))
                         .background(Color(0xFFCDE4B4)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Row(modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.Center) {
-                        var fontSize by remember { mutableStateOf(50.sp) }
-
+                    Row(modifier = Modifier.fillMaxWidth().
+                    padding(20.dp),
+                        horizontalArrangement = Arrangement.Center) {
+                        val maxFontSize = 50f
+                        val minFontSize = 20f
+                        val fontSize = if (nombre.length > 5) {
+                            (maxFontSize * (1f - nombre.length/20f)).coerceIn(minFontSize, maxFontSize)
+                        }else{
+                            //Si el nombree es corto, se usa el tamaño maximo
+                            maxFontSize
+                        }
                         Text(
                             text = "Hola, $nombre!",
-                            fontSize = fontSize,
+                            fontSize = fontSize.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF4E7029),
                             maxLines = 1,
@@ -297,4 +306,6 @@ fun NavigationButton(label: String, icon: androidx.compose.ui.graphics.vector.Im
         )
     }
 }
+
+
 
