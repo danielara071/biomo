@@ -519,7 +519,6 @@ fun ObservationFormDos(navController: NavController, formularioId: Long = 0) {
                                         )
                                         Log.d("ImageDAO", "formId: $formId")
 
-                                        appContainer.formulariosRemoteRepository.enviarFormularioDos(formulario)
 
 
 

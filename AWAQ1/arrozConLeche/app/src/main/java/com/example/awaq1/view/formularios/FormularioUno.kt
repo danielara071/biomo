@@ -507,8 +507,7 @@ fun ObservationForm(navController: NavController, formularioId: Long = 0L) {
                                         }
                                         Log.d("ImageDAO", "formId: $formId")
 
-                                        //Envio a Base de datos remota
-                                        appContainer.formulariosRemoteRepository.enviarFormularioUno(formulario)
+
 
                                         // Borrar todas las fotos en ese reporte
                                         appContainer.formulariosRepository.deleteImagesByFormulario(
