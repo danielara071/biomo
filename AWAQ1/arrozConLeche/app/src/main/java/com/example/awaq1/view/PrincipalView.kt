@@ -27,11 +27,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.room.Transaction
-import com.auth0.android.Auth0
-import com.auth0.android.authentication.AuthenticationAPIClient
-import com.auth0.android.authentication.AuthenticationException
-import com.auth0.android.callback.Callback
-import com.auth0.android.result.Credentials
 import com.example.awaq1.MainActivity
 import com.example.awaq1.R
 import com.example.awaq1.data.AccountInfo
@@ -99,90 +94,3 @@ fun PrincipalView(
         }
     }
 }
-
-//@Composable
-//fun LoginScreen(
-//    auth0: Auth0,
-//    onLoginSuccess: (Credentials, String) -> Unit,
-//    modifier: Modifier = Modifier
-//) {
-//    var username by remember { mutableStateOf("") }
-//    var password by remember { mutableStateOf("") }
-//    var errorMessage by remember { mutableStateOf<String?>(null) } // Variable de estado para el mensaje de error
-//
-//    Column(
-//        modifier = modifier
-//            .fillMaxSize()
-//            .padding(16.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Center
-//    ) {
-//        Text(stringResource(R.string.com_auth0_domain))
-//        OutlinedTextField(
-//            value = username,
-//            onValueChange = { username = it },
-//            label = { Text("Usuario") },
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        OutlinedTextField(
-//            value = password,
-//            onValueChange = { password = it },
-//            label = { Text("Contraseña") },
-//            visualTransformation = PasswordVisualTransformation(),
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        Button(
-//            onClick = {
-////                loginWithUsernamePassword(auth0, username, password, onLoginSuccess, onError = { message ->
-////                    errorMessage = message // Actualiza el mensaje de error si ocurre un problema
-////                })
-//            },
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Text("Iniciar Sesión")
-//        }
-//
-//        // Mostrar mensaje de error si existe
-//        errorMessage?.let {
-//            Spacer(modifier = Modifier.height(16.dp))
-//            Text(text = "Error: $it", color = Color.Red)
-//        }
-//    }
-//}
-//
-//fun loginWithUsernamePassword(
-//    auth0: Auth0,
-//    username: String,
-//    password: String,
-//    onSuccess: (Credentials, String) -> Unit,
-//    onError: (String) -> Unit
-//) {
-//
-//    val authentication = AuthenticationAPIClient(auth0)
-//    authentication
-//        .login(username, password, "Username-Password-Authentication")
-//        .setConnection("Username-Password-Authentication")
-//        .validateClaims()
-//        .setScope("openid profile email")
-//        .start(object : Callback<Credentials, AuthenticationException> {
-//            override fun onSuccess(result: Credentials) {
-//                Log.d("AuthSuccess", "Autenticado como \"${username}\" exitosamente")
-//                onSuccess(result, username)
-//            }
-//
-//            override fun onFailure(error: AuthenticationException) {
-//                // Imprime el error completo en los logs para ver más detalles
-//                Log.e("AuthError", "Error de autenticación: ${error.getDescription()}")
-//                // error.message no es muy descriptivo, nomas dice algo como
-//                // "Error authenticating with server" si falla cualquier cosa.
-//                // onError(error.message ?: "Error desconocido")
-//                onError(error.getDescription())
-//            }
-//        })
-//}
