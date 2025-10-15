@@ -1,6 +1,4 @@
 package com.example.awaq1.view
-
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,20 +6,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.awaq1.MainActivity
 import com.example.awaq1.R
-import com.example.awaq1.data.formularios.FormularioUnoEntity
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
 import com.example.awaq1.data.formularios.FormInfo
 import com.example.awaq1.ui.theme.components.BottomNavigationBar
 import com.example.awaq1.ui.theme.components.DisplayCard

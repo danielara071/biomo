@@ -200,7 +200,6 @@ fun Home(navController: NavController)
                         )
                     }
                 }
-
                 // Dashboard Section
                 Column(
                     modifier = Modifier
