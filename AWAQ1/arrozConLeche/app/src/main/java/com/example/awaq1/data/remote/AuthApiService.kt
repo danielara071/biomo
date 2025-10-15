@@ -1,6 +1,7 @@
 package com.example.awaq1.data.remote
 
 
+import com.example.awaq1.data.formularios.FormularioDosEntity
 import com.example.awaq1.data.formularios.FormularioUnoEntity
 import retrofit2.Response
 import retrofit2.http.Body
@@ -16,6 +17,9 @@ interface AuthApiService {
 
     @POST("/api/biomo/forms/1/submission")
     suspend fun sendFormularioUno(@Body formularioEntities: FormularioUnoEntity): Response<FormularioResponse>
+
+    @POST("/api/biomo/forms/2/submission")
+    suspend fun sendFormularioDos(@Body formularioEntities: FormularioDosEntity): Response<FormularioResponse>
 
     @POST("biomo/users/logout")
     suspend fun logout()

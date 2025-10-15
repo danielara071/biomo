@@ -17,10 +17,6 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        manifestPlaceholders.clear()
-        manifestPlaceholders["auth0Domain"] = "@string/com_auth0_domain"
-        manifestPlaceholders["auth0Scheme"] = "https"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -92,7 +88,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.auth0)
     implementation("io.coil-kt:coil-compose:2.4.0")
     // Test Imports
     testImplementation(libs.junit)

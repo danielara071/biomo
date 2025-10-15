@@ -33,8 +33,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.auth0.android.Auth0
-import com.auth0.android.result.Credentials
 import com.example.awaq1.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
