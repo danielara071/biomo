@@ -281,7 +281,15 @@ fun NavigationButton(label: String, icon: androidx.compose.ui.graphics.vector.Im
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        IconButton(onClick = onClick) {
+        IconButton(
+            onClick = onClick,
+            modifier = Modifier
+                .background(
+                    color = Color(0xFFCDE4B4), // Light green square background
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp) // Square with rounded corners
+                )
+                .padding(8.dp) // Padding inside the square
+        ) {
             Icon(
                 imageVector = icon,
                 contentDescription = label,
