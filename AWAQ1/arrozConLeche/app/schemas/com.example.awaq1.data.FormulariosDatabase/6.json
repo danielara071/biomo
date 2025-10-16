@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "3fb8b9c252b9dc270276fc08bfbf5846",
+    "identityHash": "5eb8f00100362f16a0e86f45067396fb",
     "entities": [
       {
         "tableName": "Formulario1",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`transecto` TEXT NOT NULL, `clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `tipoAnimal` TEXT NOT NULL, `nombreComun` TEXT NOT NULL, `nombreCientifico` TEXT NOT NULL, `numeroIndividuos` TEXT NOT NULL, `tipoObservacion` TEXT NOT NULL, `observaciones` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`transecto` TEXT NOT NULL, `clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `tipoAnimal` TEXT NOT NULL, `nombreComun` TEXT NOT NULL, `nombreCientifico` TEXT NOT NULL, `numeroIndividuos` TEXT NOT NULL, `tipoObservacion` TEXT NOT NULL, `observaciones` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `synced` INTEGER NOT NULL DEFAULT 0)",
         "fields": [
           {
             "fieldPath": "transecto",
@@ -91,6 +91,13 @@
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "synced",
+            "columnName": "synced",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
           }
         ],
         "primaryKey": {
@@ -104,7 +111,7 @@
       },
       {
         "tableName": "Formulario2",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`zona` TEXT NOT NULL, `clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `tipoAnimal` TEXT NOT NULL, `nombreComun` TEXT NOT NULL, `nombreCientifico` TEXT NOT NULL, `numeroIndividuos` TEXT NOT NULL, `tipoObservacion` TEXT NOT NULL, `alturaObservacion` TEXT NOT NULL, `observaciones` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`zona` TEXT NOT NULL, `clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `tipoAnimal` TEXT NOT NULL, `nombreComun` TEXT NOT NULL, `nombreCientifico` TEXT NOT NULL, `numeroIndividuos` TEXT NOT NULL, `tipoObservacion` TEXT NOT NULL, `alturaObservacion` TEXT NOT NULL, `observaciones` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `synced` INTEGER NOT NULL DEFAULT 0)",
         "fields": [
           {
             "fieldPath": "zona",
@@ -195,6 +202,13 @@
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "synced",
+            "columnName": "synced",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
           }
         ],
         "primaryKey": {
@@ -208,7 +222,7 @@
       },
       {
         "tableName": "Formulario3",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`codigo` TEXT NOT NULL, `clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `seguimiento` INTEGER NOT NULL, `cambio` INTEGER NOT NULL, `cobertura` TEXT NOT NULL, `tipoCultivo` TEXT NOT NULL, `disturbio` TEXT NOT NULL, `observaciones` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`codigo` TEXT NOT NULL, `clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `seguimiento` INTEGER NOT NULL, `cambio` INTEGER NOT NULL, `cobertura` TEXT NOT NULL, `tipoCultivo` TEXT NOT NULL, `disturbio` TEXT NOT NULL, `observaciones` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `synced` INTEGER NOT NULL DEFAULT 0)",
         "fields": [
           {
             "fieldPath": "codigo",
@@ -293,6 +307,13 @@
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "synced",
+            "columnName": "synced",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
           }
         ],
         "primaryKey": {
@@ -306,7 +327,7 @@
       },
       {
         "tableName": "Formulario4",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`codigo` TEXT NOT NULL, `clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `quad_a` TEXT NOT NULL, `quad_b` TEXT NOT NULL, `sub_quad` TEXT NOT NULL, `habitoDeCrecimiento` TEXT NOT NULL, `nombreComun` TEXT NOT NULL, `nombreCientifico` TEXT NOT NULL, `placa` TEXT NOT NULL, `circunferencia` TEXT NOT NULL, `distancia` TEXT NOT NULL, `estatura` TEXT NOT NULL, `altura` TEXT NOT NULL, `observaciones` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`codigo` TEXT NOT NULL, `clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `quad_a` TEXT NOT NULL, `quad_b` TEXT NOT NULL, `sub_quad` TEXT NOT NULL, `habitoDeCrecimiento` TEXT NOT NULL, `nombreComun` TEXT NOT NULL, `nombreCientifico` TEXT NOT NULL, `placa` TEXT NOT NULL, `circunferencia` TEXT NOT NULL, `distancia` TEXT NOT NULL, `estatura` TEXT NOT NULL, `altura` TEXT NOT NULL, `observaciones` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `synced` INTEGER NOT NULL DEFAULT 0)",
         "fields": [
           {
             "fieldPath": "codigo",
@@ -427,6 +448,13 @@
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "synced",
+            "columnName": "synced",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
           }
         ],
         "primaryKey": {
@@ -440,7 +468,7 @@
       },
       {
         "tableName": "Formulario5",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`zona` TEXT NOT NULL, `clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `tipoAnimal` TEXT NOT NULL, `nombreComun` TEXT NOT NULL, `nombreCientifico` TEXT NOT NULL, `numeroIndividuos` TEXT NOT NULL, `tipoObservacion` TEXT NOT NULL, `alturaObservacion` TEXT NOT NULL, `observaciones` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`zona` TEXT NOT NULL, `clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `tipoAnimal` TEXT NOT NULL, `nombreComun` TEXT NOT NULL, `nombreCientifico` TEXT NOT NULL, `numeroIndividuos` TEXT NOT NULL, `tipoObservacion` TEXT NOT NULL, `alturaObservacion` TEXT NOT NULL, `observaciones` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `synced` INTEGER NOT NULL DEFAULT 0)",
         "fields": [
           {
             "fieldPath": "zona",
@@ -531,6 +559,13 @@
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "synced",
+            "columnName": "synced",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
           }
         ],
         "primaryKey": {
@@ -544,7 +579,7 @@
       },
       {
         "tableName": "Formulario6",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`codigo` TEXT NOT NULL, `clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `zona` TEXT NOT NULL, `nombreCamara` TEXT NOT NULL, `placaCamara` TEXT NOT NULL, `placaGuaya` TEXT NOT NULL, `anchoCamino` TEXT NOT NULL, `fechaInstalacion` TEXT NOT NULL, `distanciaObjetivo` TEXT NOT NULL, `alturaLente` TEXT NOT NULL, `checklist` TEXT NOT NULL, `observaciones` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`codigo` TEXT NOT NULL, `clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `zona` TEXT NOT NULL, `nombreCamara` TEXT NOT NULL, `placaCamara` TEXT NOT NULL, `placaGuaya` TEXT NOT NULL, `anchoCamino` TEXT NOT NULL, `fechaInstalacion` TEXT NOT NULL, `distanciaObjetivo` TEXT NOT NULL, `alturaLente` TEXT NOT NULL, `checklist` TEXT NOT NULL, `observaciones` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `synced` INTEGER NOT NULL DEFAULT 0)",
         "fields": [
           {
             "fieldPath": "codigo",
@@ -653,6 +688,13 @@
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "synced",
+            "columnName": "synced",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
           }
         ],
         "primaryKey": {
@@ -666,7 +708,7 @@
       },
       {
         "tableName": "Formulario7",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `zona` TEXT NOT NULL, `pluviosidad` TEXT NOT NULL, `temperaturaMaxima` TEXT NOT NULL, `humedadMaxima` TEXT NOT NULL, `temperaturaMinima` TEXT NOT NULL, `nivelQuebrada` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`clima` TEXT NOT NULL, `temporada` TEXT NOT NULL, `zona` TEXT NOT NULL, `pluviosidad` TEXT NOT NULL, `temperaturaMaxima` TEXT NOT NULL, `humedadMaxima` TEXT NOT NULL, `temperaturaMinima` TEXT NOT NULL, `nivelQuebrada` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `fecha` TEXT NOT NULL, `editado` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `synced` INTEGER NOT NULL DEFAULT 0)",
         "fields": [
           {
             "fieldPath": "clima",
@@ -745,6 +787,13 @@
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "synced",
+            "columnName": "synced",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
           }
         ],
         "primaryKey": {
@@ -1186,7 +1235,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3fb8b9c252b9dc270276fc08bfbf5846')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5eb8f00100362f16a0e86f45067396fb')"
     ]
   }
 }
