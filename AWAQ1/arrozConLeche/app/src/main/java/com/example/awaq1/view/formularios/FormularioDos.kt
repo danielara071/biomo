@@ -497,7 +497,7 @@ fun ObservationFormDos(navController: NavController, formularioId: Long = 0) {
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Button(
-                                onClick = { navController.navigate("elegir_reporte") },
+                                onClick = { navController.navigate("home") },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(0xFF4E7029),
                                     contentColor = Color.White
@@ -575,7 +575,7 @@ fun ObservationFormDos(navController: NavController, formularioId: Long = 0) {
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text(
-                                    "Enviar",
+                                    "Guardar",
                                     style = TextStyle(
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.SemiBold
