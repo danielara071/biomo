@@ -18,6 +18,7 @@ import androidx.compose.material3.ButtonDefaults
 import com.example.awaq1.data.formularios.FormInfo
 import com.example.awaq1.ui.theme.components.BottomNavigationBar
 import com.example.awaq1.ui.theme.components.DisplayCard
+import com.example.awaq1.ui.theme.components.searchBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,22 +48,35 @@ fun ObservationListScreen(navController: NavController) {
         }
     }
     var filtroSeleccionado by remember { mutableStateOf("") }
-
+    var query by remember { mutableStateOf("") }
 
     //Filtrar los formularios segun el flitro seleccionado
     //TODO(Hay que agregar los filtros de subido y no subido)
-    var filtered = remember(filtroSeleccionado) {
+    val filtered = remember(allForms, filtroSeleccionado, query) {
         allForms.filter { form ->
-            when(filtroSeleccionado){
+            val q = query.trim().lowercase()
+
+            val matchesFilter = when(filtroSeleccionado){
                 "Completo" -> form.completo
                 "Incompleto" -> !form.completo
                 "Subido" -> false
                 "No Subido" -> false
                 else -> true
             }
+            val matchesQuery = q.isBlank() || listOf(
+                form.tipo,
+                form.valorIdentificador,
+                form.primerTag,
+                form.primerContenido,
+                form.segundoTag,
+                form.segundoContenido,
+                form.fechaCreacion,
+                form.fechaEdicion
+            ).any{it.lowercase().contains(q)}
+            matchesFilter && matchesQuery
         }
     }
-    val visibleList = if(filtroSeleccionado.isBlank()) allForms else filtered
+    val visibleList = if(filtroSeleccionado.isBlank() && query.isBlank()) allForms else filtered
 
     Scaffold(
         topBar = {
@@ -117,6 +131,11 @@ fun ObservationListScreen(navController: NavController) {
                         onSelected = { filtroSeleccionado = if (filtroSeleccionado == "No Subido") "" else "No Subido" }
                     )
                 }
+
+                Spacer(modifier = Modifier.height(14.dp))
+                searchBar(value = query,
+                    onValueChange = {query = it},
+                    placeholder = "Buscar Formulario")
 
                 LazyColumn(
                     modifier = Modifier
