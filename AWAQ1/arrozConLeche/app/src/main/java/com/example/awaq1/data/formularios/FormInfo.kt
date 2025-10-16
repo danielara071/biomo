@@ -14,7 +14,8 @@ data class FormInfo(
     val formId: Long,
     val fechaCreacion: String,
     val fechaEdicion: String,
-    val completo: Boolean
+    val completo: Boolean,
+    val synced: Boolean
 ) {
     constructor(formulario: FormularioUnoEntity) : this(
         tipo = "Transecto", formulario.transecto,
@@ -24,7 +25,8 @@ data class FormInfo(
         formId = formulario.id,
         fechaCreacion = formulario.fecha,
         fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
+        completo = formulario.esCompleto(),
+        synced = formulario.synced
     )
 
     constructor(formulario: FormularioDosEntity) : this(
@@ -35,7 +37,8 @@ data class FormInfo(
         formId = formulario.id,
         fechaCreacion = formulario.fecha,
         fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
+        completo = formulario.esCompleto(),
+        synced = formulario.synced
     )
 
     constructor(formulario: FormularioTresEntity) : this(
@@ -46,7 +49,8 @@ data class FormInfo(
         formId = formulario.id,
         fechaCreacion = formulario.fecha,
         fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
+        completo = formulario.esCompleto(),
+        synced = formulario.synced
     )
 
     constructor(formulario: FormularioCuatroEntity) : this(
@@ -57,7 +61,8 @@ data class FormInfo(
         formId = formulario.id,
         fechaCreacion = formulario.fecha,
         fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
+        completo = formulario.esCompleto(),
+        synced = formulario.synced
     )
 
     constructor(formulario: FormularioCincoEntity) : this(
@@ -68,7 +73,8 @@ data class FormInfo(
         formId = formulario.id,
         fechaCreacion = formulario.fecha,
         fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
+        completo = formulario.esCompleto(),
+        synced = formulario.synced
     )
 
     constructor(formulario: FormularioSeisEntity) : this(
@@ -79,7 +85,8 @@ data class FormInfo(
         formId = formulario.id,
         fechaCreacion = formulario.fecha,
         fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
+        completo = formulario.esCompleto(),
+        synced = formulario.synced
     )
 
     constructor(formulario: FormularioSieteEntity) : this(
@@ -90,6 +97,7 @@ data class FormInfo(
         formId = formulario.id,
         fechaCreacion = formulario.fecha,
         fechaEdicion = formulario.editado,
-        completo = formulario.esCompleto()
+        completo = formulario.esCompleto(),
+        synced = formulario.synced
     )
 }

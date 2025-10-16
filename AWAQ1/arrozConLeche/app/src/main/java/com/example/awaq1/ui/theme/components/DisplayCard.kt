@@ -64,21 +64,20 @@ fun DisplayCard(
                     color = Color.Black
                 )
                 Row(verticalAlignment = Alignment.CenterVertically){
-                    if(formInfo.completo){
+                    if(formInfo.synced) {
+                        Icon(
+                            imageVector = Icons.Rounded.CheckCircle,
+                            contentDescription = null,
+                            tint = Color(0xFF2E7D32) // Green color
+                        )
+                    }
+                    else if(formInfo.completo && !formInfo.synced){
                         // Completed form: show yellow warning
                         Icon(
                             imageVector = Icons.Rounded.Warning,
                             contentDescription = null,
                             tint = Color(0xFFED9121) // Yellow color
                         )
-                        
-                        // TODO: Future implementation for backend sync status
-                        // When form is synced successfully with backend, show green check:
-                        // Icon(
-                        //     imageVector = Icons.Rounded.CheckCircle,
-                        //     contentDescription = null,
-                        //     tint = Color(0xFF2E7D32) // Green color
-                        // )
                     }else{
                         // Incomplete form: show red warning
                         Icon(

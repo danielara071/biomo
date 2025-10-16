@@ -81,7 +81,7 @@ fun UserSettingsScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                SettingsSection("GENERAL", listOf("Editar Perfil", "Cambiar contraseña"))
+                SettingsSection("GENERAL", listOf("Editar Perfil"))
                 Spacer(modifier = Modifier.height(16.dp))
                 SettingsSection("NOTIFICACIONES", listOf("Notificaciones"))
                 Spacer(modifier = Modifier.height(16.dp))
