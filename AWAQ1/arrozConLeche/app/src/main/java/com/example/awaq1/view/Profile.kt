@@ -11,12 +11,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.awaq1.MainActivity
 import com.example.awaq1.R
 import com.example.awaq1.ui.theme.components.BottomNavigationBar
 
@@ -24,6 +26,10 @@ import com.example.awaq1.ui.theme.components.BottomNavigationBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserSettingsScreen(navController: NavController) {
+    val context = LocalContext.current as MainActivity
+    val nombre = context.accountInfo.username.substringBefore("@")
+    val email = context.accountInfo.username
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { paddingValues ->
@@ -49,7 +55,7 @@ fun UserSettingsScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
-                    text = "Hola \nSamantha",
+                    text = "Hola \n$nombre",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
@@ -69,7 +75,7 @@ fun UserSettingsScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                UserInfoRow(icon = Icons.Default.Email, info = "samanthasmith@gmail.com")
+                UserInfoRow(icon = Icons.Default.Email, info = email)
                 UserInfoRow(icon = Icons.Default.Lock, info = "Password")
                 UserInfoRow(icon = Icons.Default.Phone, info = "+57 312 345 6789")
 

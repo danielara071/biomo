@@ -128,7 +128,6 @@ fun Home(navController: NavController) {
         }
     }
     //Mostrar solo formularios que coincidan
-
     //Filtrar por texto
     val filtered = remember(allForms, query) {
         if(query.isBlank()) allForms

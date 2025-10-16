@@ -46,18 +46,30 @@ fun ObservationListScreen(navController: NavController) {
             addAll(forms7.map(::FormInfo))
         }
     }
+    var filtroSeleccionado by remember { mutableStateOf("") }
 
-    var completoSelected by remember { mutableStateOf(false) }
-    var incompletoSelected by remember { mutableStateOf(false) }
-    var subidoSelected by remember { mutableStateOf(false) }
-    var noSubidoSelected by remember { mutableStateOf(false) }
+
+    //Filtrar los formularios segun el flitro seleccionado
+    //TODO(Hay que agregar los filtros de subido y no subido)
+    var filtered = remember(filtroSeleccionado) {
+        allForms.filter { form ->
+            when(filtroSeleccionado){
+                "Completo" -> form.completo
+                "Incompleto" -> !form.completo
+                "Subido" -> false
+                "No Subido" -> false
+                else -> true
+            }
+        }
+    }
+    val visibleList = if(filtroSeleccionado.isBlank()) allForms else filtered
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Lista de Observaciones") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigate("settings") }) {
+                    IconButton(onClick = { navController.navigate("home") }) {
                         Icon(
                             painter = painterResource(id = R.drawable.leading_iconarrow),
                             contentDescription = "Atrás"
@@ -86,23 +98,23 @@ fun ObservationListScreen(navController: NavController) {
                 ) {
                     FilterButton(
                         text = "Completo",
-                        selected = completoSelected,
-                        onSelected = { completoSelected = it }
+                        selected = filtroSeleccionado == "Completo",
+                        onSelected = { filtroSeleccionado = if (filtroSeleccionado == "Completo") "" else "Completo" }
                     )
                     FilterButton(
                         text = "Incompleto",
-                        selected = incompletoSelected,
-                        onSelected = { incompletoSelected = it }
+                        selected = filtroSeleccionado == "Incompleto",
+                        onSelected = { filtroSeleccionado = if (filtroSeleccionado == "Incompleto") "" else "Incompleto" }
                     )
                     FilterButton(
                         text = "Subido",
-                        selected = subidoSelected,
-                        onSelected = { subidoSelected = it }
+                        selected = filtroSeleccionado == "Subido",
+                        onSelected = { filtroSeleccionado = if (filtroSeleccionado == "Subido") "" else "Subido"}
                     )
                     FilterButton(
                         text = "No Subido",
-                        selected = noSubidoSelected,
-                        onSelected = { noSubidoSelected = it }
+                        selected = filtroSeleccionado == "No Subido",
+                        onSelected = { filtroSeleccionado = if (filtroSeleccionado == "No Subido") "" else "No Subido" }
                     )
                 }
 
@@ -111,7 +123,7 @@ fun ObservationListScreen(navController: NavController) {
                         .padding(16.dp)
                         .fillMaxSize()
                 ) {
-                    items(allForms) { form ->
+                    items(visibleList) { form ->
                         DisplayCard(navController = navController , formInfo = form)
                     }
                 }
