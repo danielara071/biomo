@@ -32,19 +32,19 @@ class MainActivity : ComponentActivity() {
 
 
     private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
+    // Función principal que se ejecuta al crear la actividad
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Inicializar el contenedor de datos de la aplicación
         container = AppDataContainer(this)
 
+        // Configurar el sistema de autenticación y API
         val tokenManager = TokenManager(applicationContext)
         val apiService = RetrofitClient.create(tokenManager)
         val authRepository = AuthRepository(apiService, tokenManager)
 
-
-
-
-
+        // Configurar el launcher para solicitar permisos de ubicación
         locationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted ->
@@ -52,12 +52,14 @@ class MainActivity : ComponentActivity() {
                 Log.d("MainActivity", "Location permission is required but not granted.")
             }
         }
+        // Verificar y solicitar permisos de cámara si es necesario
         if (!arePermissionsGranted()) {
             ActivityCompat.requestPermissions(
                 this, CAMERA_PERMISSION, 100
             )
         }
 
+        // Habilitar modo edge-to-edge y configurar la interfaz
         enableEdgeToEdge()
         setContent {
             AWAQ1Theme {
@@ -65,11 +67,13 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    // Solicita permisos de ubicación al usuario
     fun requestLocationPermission() {
         if (!Ubicacion(this).hasLocationPermission()) {
             locationPermissionLauncher.launch(Ubicacion.LOCATION_PERMISSION)
         }
     }
+    // Verifica si todos los permisos necesarios han sido otorgados
     fun arePermissionsGranted(): Boolean {
         return CAMERA_PERMISSION.all { permission ->
             ContextCompat.checkSelfPermission(
@@ -79,7 +83,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // Objeto compañero que contiene las constantes de permisos
     companion object {
+        // Array con los permisos de cámara requeridos
         val CAMERA_PERMISSION = arrayOf(
             Manifest.permission.CAMERA
         )
