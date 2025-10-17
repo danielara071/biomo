@@ -31,6 +31,9 @@ data class FormularioUnoEntity(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 
+    @androidx.room.ColumnInfo(defaultValue = "0")
+    var synced: Boolean = false
+
     fun withID(id: Long): FormularioUnoEntity {
         val newForm = this.copy()
         newForm.id = id
@@ -72,6 +75,9 @@ data class FormularioDosEntity(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 
+    @androidx.room.ColumnInfo(defaultValue = "0")
+    var synced: Boolean = false
+
     fun withID(id: Long): FormularioDosEntity {
         val newForm = this.copy()
         newForm.id = id
@@ -110,6 +116,9 @@ data class FormularioTresEntity(
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
+
+    @androidx.room.ColumnInfo(defaultValue = "0")
+    var synced: Boolean = false
 
     fun withID(id: Long): FormularioTresEntity {
         val newForm = this.copy()
@@ -153,6 +162,9 @@ data class FormularioCuatroEntity(
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
+
+    @androidx.room.ColumnInfo(defaultValue = "0")
+    var synced: Boolean = false
 
     fun withID(id: Long): FormularioCuatroEntity {
         val newForm = this.copy()
@@ -199,6 +211,9 @@ data class FormularioCincoEntity(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 
+    @androidx.room.ColumnInfo(defaultValue = "0")
+    var synced: Boolean = false
+
     fun withID(id: Long): FormularioCincoEntity {
         val newForm = this.copy()
         newForm.id = id
@@ -243,6 +258,9 @@ data class FormularioSeisEntity(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 
+    @androidx.room.ColumnInfo(defaultValue = "0")
+    var synced: Boolean = false
+
     fun withID(id: Long): FormularioSeisEntity {
         val newForm = this.copy()
         newForm.id = id
@@ -286,6 +304,9 @@ data class FormularioSieteEntity(
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
+
+    @androidx.room.ColumnInfo(defaultValue = "0")
+    var synced: Boolean = false
 
     fun withID(id: Long): FormularioSieteEntity {
         val newForm = this.copy()

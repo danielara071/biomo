@@ -186,9 +186,35 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        location?.let { (latitude, longitude) ->
-                            Text("Ubicacion Actual: Lati: $latitude, Long: $longitude")
-                        } ?: Text("Buscando ubicacion...")
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color(0xFFF9F9F9), RoundedCornerShape(10.dp))
+                                .border(1.dp, Color(0xFF4E7029), RoundedCornerShape(10.dp))
+                                .padding(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column {
+                                    Text("Ubicación Actual:", fontWeight = FontWeight.Bold, color = Color.Black)
+                                    Text(
+                                        text = location?.let { "Lati: ${it.first}\nLong: ${it.second}" }
+                                            ?: "Buscando ubicación...",
+                                        fontSize = 14.sp, color = Color.DarkGray
+                                    )
+                                }
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.compass_icon),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(60.dp)
+                                )
+                            }
+                        }
+
 
                         OutlinedTextField(
                             value = codigo,
@@ -437,7 +463,7 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Button(
-                                onClick = { navController.navigate("elegir_reporte") },
+                                onClick = { navController.navigate("home") },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(0xFF4E7029),
                                     contentColor = Color.White
@@ -509,7 +535,7 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text(
-                                    "Enviar",
+                                    "Guardar",
                                     style = TextStyle(
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.SemiBold

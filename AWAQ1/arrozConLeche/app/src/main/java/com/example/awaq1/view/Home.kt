@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +62,10 @@ import com.example.awaq1.ui.theme.components.BottomNavigationBar
 import com.example.awaq1.ui.theme.components.DisplayCard
 import com.example.awaq1.ui.theme.components.searchBar
 import kotlin.collections.buildList
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import com.example.awaq1.data.syncAllPending
+import kotlinx.coroutines.launch
 
 @Composable
 fun Home(navController: NavController) {
@@ -152,6 +158,19 @@ fun Home(navController: NavController) {
     val userTotal = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
         forms1.size + forms2.size + forms3.size + forms4.size + forms5.size + forms6.size + forms7.size
     }
+
+    val pendingCount = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
+        forms1.count { it.esCompleto() && !it.synced } +
+                forms2.count { it.esCompleto() && !it.synced } +
+                forms3.count { it.esCompleto() && !it.synced } +
+                forms4.count { it.esCompleto() && !it.synced } +
+                forms5.count { it.esCompleto() && !it.synced } +
+                forms6.count { it.esCompleto() && !it.synced } +
+                forms7.count { it.esCompleto() && !it.synced }
+    }
+
+    val scope = rememberCoroutineScope()
+    val snack = remember { SnackbarHostState() }
     val visibleTotal = if (query.isBlank()) userTotal else filtered.size
     val visibleList = if(query.isBlank()) allForms else filtered
 
@@ -199,14 +218,42 @@ fun Home(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally
 
                 ) {
-                    Text(
-                        text = "DASHBOARD",
-                        fontSize = 35.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF333333),
-                        modifier = Modifier.padding(bottom = 8.dp),
-                        textAlign = TextAlign.Center
-                    )
+                    Row {
+                        Text(
+                            text = "DASHBOARD",
+                            fontSize = 35.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF333333),
+                            modifier = Modifier.padding(bottom = 8.dp),
+                            textAlign = TextAlign.Center
+                        )
+
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Button(
+                                enabled = pendingCount > 0,
+                                onClick = {
+                                    scope.launch {
+                                        val result = syncAllPending(
+                                            api = appContainer.authApiService,  // Asegúrate de exponerlo en tu container
+                                            repo = appContainer.formulariosRepository,
+                                            forms1, forms2, forms3, forms4, forms5, forms6, forms7
+                                        )
+                                        val msg = if (result.errors.isEmpty()) {
+                                            "Sincronizados: ${result.successCount}"
+                                        } else {
+                                            "Sincronizados: ${result.successCount}. Errores: ${result.errors.size}"
+                                        }
+                                        snack.showSnackbar(msg)
+                                    }
+                                }
+                            ) {
+                                Text(text = if (pendingCount > 0) "Sincronizar ($pendingCount)" else "Sincronizar")
+                            }
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(14.dp))
                     searchBar(value = query,
@@ -281,7 +328,15 @@ fun NavigationButton(label: String, icon: androidx.compose.ui.graphics.vector.Im
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        IconButton(onClick = onClick) {
+        IconButton(
+            onClick = onClick,
+            modifier = Modifier
+                .background(
+                    color = Color(0xFFCDE4B4), // Light green square background
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp) // Square with rounded corners
+                )
+                .padding(8.dp) // Padding inside the square
+        ) {
             Icon(
                 imageVector = icon,
                 contentDescription = label,

@@ -63,9 +63,6 @@ fun Settings(navController: NavController, onLogout: () -> Unit) {
                 MenuItem("Editar Perfil") {
                     navController.navigate("perfil")
                 }
-                MenuItem("Cambiar contraseña") {
-                    // Acción para cambiar contraseña
-                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 

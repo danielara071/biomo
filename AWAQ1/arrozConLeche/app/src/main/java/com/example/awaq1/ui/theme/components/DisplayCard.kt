@@ -64,17 +64,26 @@ fun DisplayCard(
                     color = Color.Black
                 )
                 Row(verticalAlignment = Alignment.CenterVertically){
-                    if(formInfo.completo){
+                    if(formInfo.synced) {
                         Icon(
                             imageVector = Icons.Rounded.CheckCircle,
                             contentDescription = null,
-                            tint = Color(0xFF2E7D32)
+                            tint = Color(0xFF2E7D32) // Green color
                         )
-                    }else{
+                    }
+                    else if(formInfo.completo && !formInfo.synced){
+                        // Completed form: show yellow warning
                         Icon(
                             imageVector = Icons.Rounded.Warning,
                             contentDescription = null,
-                            tint = Color(0xFFED9121)
+                            tint = Color(0xFFED9121) // Yellow color
+                        )
+                    }else{
+                        // Incomplete form: show red warning
+                        Icon(
+                            imageVector = Icons.Rounded.Warning,
+                            contentDescription = null,
+                            tint = Color(0xFFD32F2F) // Red color
                         )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
