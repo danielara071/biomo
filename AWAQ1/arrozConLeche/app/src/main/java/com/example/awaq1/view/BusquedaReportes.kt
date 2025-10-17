@@ -78,8 +78,8 @@ fun ObservationListScreen(navController: NavController) {
             val matchesFilter = when(filtroSeleccionado){
                 "Completo" -> form.completo
                 "Incompleto" -> !form.completo
-                "Subido" -> false
-                "No Subido" -> false
+                "Subido" -> form.synced
+                "No Subido" -> !form.synced
                 else -> true
             }
             val matchesQuery = q.isBlank() || listOf(
