@@ -133,27 +133,7 @@ fun Home(navController: NavController) {
             addAll(forms7.map { FormInfo(it) })
         }
     }
-    //Mostrar solo formularios que coincidan
-    //Filtrar por texto
-    val filtered = remember(allForms, query) {
-        if(query.isBlank()) allForms
-        else{
-            val q = query.trim().lowercase()
-            allForms.filter { info ->
-            listOf(
-                info.tipo,
-                info.valorIdentificador,
-                info.primerTag,
-                info.primerContenido,
-                info.segundoTag,
-                info.segundoContenido,
-                info.fechaCreacion,
-                info.fechaEdicion
-            ).any{it.lowercase().contains(q)}
-            }
-        }
 
-    }
     //Formularios totales por usuario
     val userTotal = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
         forms1.size + forms2.size + forms3.size + forms4.size + forms5.size + forms6.size + forms7.size
@@ -171,8 +151,6 @@ fun Home(navController: NavController) {
 
     val scope = rememberCoroutineScope()
     val snack = remember { SnackbarHostState() }
-    val visibleTotal = if (query.isBlank()) userTotal else filtered.size
-    val visibleList = if(query.isBlank()) allForms else filtered
 
     Scaffold(
         bottomBar = {
@@ -228,37 +206,30 @@ fun Home(navController: NavController) {
                             textAlign = TextAlign.Center
                         )
 
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            Button(
-                                enabled = pendingCount > 0,
-                                onClick = {
-                                    scope.launch {
-                                        val result = syncAllPending(
-                                            api = appContainer.authApiService,  // Asegúrate de exponerlo en tu container
-                                            repo = appContainer.formulariosRepository,
-                                            forms1, forms2, forms3, forms4, forms5, forms6, forms7
-                                        )
-                                        val msg = if (result.errors.isEmpty()) {
-                                            "Sincronizados: ${result.successCount}"
-                                        } else {
-                                            "Sincronizados: ${result.successCount}. Errores: ${result.errors.size}"
-                                        }
-                                        snack.showSnackbar(msg)
-                                    }
+
+                    }
+                    Button(
+                        enabled = pendingCount > 0,
+                        onClick = {
+                            scope.launch {
+                                val result = syncAllPending(
+                                    api = appContainer.authApiService,  // Asegúrate de exponerlo en tu container
+                                    repo = appContainer.formulariosRepository,
+                                    forms1, forms2, forms3, forms4, forms5, forms6, forms7
+                                )
+                                val msg = if (result.errors.isEmpty()) {
+                                    "Sincronizados: ${result.successCount}"
+                                } else {
+                                    "Sincronizados: ${result.successCount}. Errores: ${result.errors.size}"
                                 }
-                            ) {
-                                Text(text = if (pendingCount > 0) "Sincronizar ($pendingCount)" else "Sincronizar")
+                                snack.showSnackbar(msg)
                             }
                         }
+                    ) {
+                        Text(text = if (pendingCount > 0) "Sincronizar ($pendingCount)" else "Sincronizar")
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))
-                    searchBar(value = query,
-                        onValueChange = {query = it},
-                        placeholder = "Buscar Formulario")
                     // Stats Row
                     Row(
                         horizontalArrangement = Arrangement.SpaceAround,
@@ -266,7 +237,7 @@ fun Home(navController: NavController) {
                     ) {
 
 
-                        StatsColumn(label = "Total", count = visibleTotal, color = Color.Black)
+                        StatsColumn(label = "Total", count = userTotal, color = Color.Black)
                     }
 
 
@@ -280,23 +251,11 @@ fun Home(navController: NavController) {
                             .padding(horizontal = 0.dp, vertical = 8.dp)
                             .fillMaxWidth()
                     ) {
-                        if(visibleList.isEmpty()){
-                            item{
-                                Text(
-                                    text = if(query.isBlank()) "No hay formularios" else "Sin resultados para \"$query\"",
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(24.dp),
-                                    textAlign = TextAlign.Center,
-                                    color = Color.Gray
-                                )
-                            }
-                        } else{
-                            items(visibleList,
-                                key = {it.formId to it.formulario //clave estable
-                                }){formInfo ->
-                                DisplayCard(navController = navController, formInfo = formInfo)
-                            }
+
+                        items(allForms,
+                            key = {it.formId to it.formulario //clave estable
+                            }){formInfo ->
+                            DisplayCard(navController = navController, formInfo = formInfo)
                         }
                     }
                 }
