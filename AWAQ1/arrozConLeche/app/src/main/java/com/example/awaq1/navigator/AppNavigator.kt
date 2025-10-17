@@ -1,4 +1,5 @@
 package com.example.awaq1.navigator
+import ObservationListScreen
 import UserSettingsScreen
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -18,7 +19,6 @@ import com.example.awaq1.view.formularios.ObservationFormCuatro
 import com.example.awaq1.view.formularios.ObservationFormSeis
 import com.example.awaq1.view.formularios.ObservationFormSiete
 import com.example.awaq1.view.formularios.ObservationFormTres
-import com.example.awaq1.view.ObservationListScreen
 import com.example.awaq1.view.SelectFormularioScreen
 import com.example.awaq1.view.Settings
 import com.example.awaq1.view.TwoFactor
