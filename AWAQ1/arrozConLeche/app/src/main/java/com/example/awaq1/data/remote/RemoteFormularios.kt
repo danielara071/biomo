@@ -8,6 +8,7 @@ import com.example.awaq1.data.formularios.FormularioSieteEntity
 import com.example.awaq1.data.formularios.FormularioTresEntity
 import com.example.awaq1.data.formularios.FormularioUnoEntity
 
+/*
 class FormulariosRemoteRepository(private val api: AuthApiService) {
     suspend fun enviarFormularioUno(form: FormularioUnoEntity): Result<Unit> {
         return try {
@@ -79,3 +80,6 @@ class FormulariosRemoteRepository(private val api: AuthApiService) {
         }
     }
 }
+
+
+ */
