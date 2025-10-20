@@ -65,6 +65,7 @@ import kotlin.collections.buildList
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import com.example.awaq1.data.syncAllPending
+import com.example.awaq1.ui.theme.components.AlertSyncBanner
 import kotlinx.coroutines.launch
 
 @Composable
@@ -134,12 +135,13 @@ fun Home(navController: NavController) {
         }
     }
 
+
     //Formularios totales por usuario
     val userTotal = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
         forms1.size + forms2.size + forms3.size + forms4.size + forms5.size + forms6.size + forms7.size
     }
 
-    val pendingCount = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
+    val pendingCountSync = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
         forms1.count { it.esCompleto() && !it.synced } +
                 forms2.count { it.esCompleto() && !it.synced } +
                 forms3.count { it.esCompleto() && !it.synced } +
@@ -148,6 +150,17 @@ fun Home(navController: NavController) {
                 forms6.count { it.esCompleto() && !it.synced } +
                 forms7.count { it.esCompleto() && !it.synced }
     }
+
+    val pendingCompletar = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
+        forms1.count { !it.esCompleto() } +
+                forms2.count { !it.esCompleto()} +
+                forms3.count { !it.esCompleto() } +
+                forms4.count { !it.esCompleto()} +
+                forms5.count { !it.esCompleto()} +
+                forms6.count { !it.esCompleto()} +
+                forms7.count { !it.esCompleto() }
+    }
+
 
     val scope = rememberCoroutineScope()
     val snack = remember { SnackbarHostState() }
@@ -169,13 +182,13 @@ fun Home(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp)
-                        .clip(RoundedCornerShape(bottomStart = 2000.dp, bottomEnd = 2000.dp))
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(bottomStart = 500.dp, bottomEnd = 500.dp))
                         .background(Color(0xFFCDE4B4)),
                     contentAlignment = Alignment.Center
                 ) {
                     Row(modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.Center) {
-                        var fontSize by remember { mutableStateOf(50.sp) }
+                        var fontSize by remember { mutableStateOf(40.sp) }
 
                         Text(
                             text = "Hola, $nombre!",
@@ -199,7 +212,7 @@ fun Home(navController: NavController) {
                     Row {
                         Text(
                             text = "DASHBOARD",
-                            fontSize = 35.sp,
+                            fontSize = 30.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF333333),
                             modifier = Modifier.padding(bottom = 8.dp),
@@ -208,8 +221,19 @@ fun Home(navController: NavController) {
 
 
                     }
+
+                    if (pendingCountSync > 0) {
+                        AlertSyncBanner(pendingCountSync, "sin subir a la nube", Color(0xFFED9121) )
+                    }
+
+                    if (pendingCompletar > 0) {
+                        AlertSyncBanner(pendingCompletar, "sin completar", Color(0xFFD32F2F))
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
                     Button(
-                        enabled = pendingCount > 0,
+                        enabled = pendingCountSync > 0,
                         onClick = {
                             scope.launch {
                                 val result = syncAllPending(
@@ -226,10 +250,11 @@ fun Home(navController: NavController) {
                             }
                         }
                     ) {
-                        Text(text = if (pendingCount > 0) "Sincronizar ($pendingCount)" else "Sincronizar")
+                        Text(text = if (pendingCountSync > 0) "Sincronizar ($pendingCountSync)" else "Sincronizar")
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))
+
                     // Stats Row
                     Row(
                         horizontalArrangement = Arrangement.SpaceAround,
