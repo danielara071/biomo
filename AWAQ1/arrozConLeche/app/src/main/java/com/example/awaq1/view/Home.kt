@@ -72,7 +72,6 @@ import kotlinx.coroutines.launch
 fun Home(navController: NavController) {
     val context = LocalContext.current as MainActivity
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
-    var query by remember { mutableStateOf("") }
     val ubicacion = Ubicacion(context)
     if(location == null){
         LaunchedEffect(Unit) {
@@ -121,8 +120,7 @@ fun Home(navController: NavController) {
         context.accountInfo.user_id
     )
         .collectAsState(initial = emptyList())
-    val count by appContainer.formulariosRepository.getAllFormulariosCount()
-        .collectAsState(initial = 0)
+
     val allForms = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
         buildList{
             addAll(forms1.map { FormInfo(it) })
@@ -141,7 +139,7 @@ fun Home(navController: NavController) {
         forms1.size + forms2.size + forms3.size + forms4.size + forms5.size + forms6.size + forms7.size
     }
 
-    val pendingCountSync = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
+    val pendingCountSync =
         forms1.count { it.esCompleto() && !it.synced } +
                 forms2.count { it.esCompleto() && !it.synced } +
                 forms3.count { it.esCompleto() && !it.synced } +
@@ -149,9 +147,8 @@ fun Home(navController: NavController) {
                 forms5.count { it.esCompleto() && !it.synced } +
                 forms6.count { it.esCompleto() && !it.synced } +
                 forms7.count { it.esCompleto() && !it.synced }
-    }
 
-    val pendingCompletar = remember(forms1, forms2, forms3, forms4, forms5, forms6, forms7) {
+    val pendingCompletar =
         forms1.count { !it.esCompleto() } +
                 forms2.count { !it.esCompleto()} +
                 forms3.count { !it.esCompleto() } +
@@ -159,13 +156,14 @@ fun Home(navController: NavController) {
                 forms5.count { !it.esCompleto()} +
                 forms6.count { !it.esCompleto()} +
                 forms7.count { !it.esCompleto() }
-    }
 
 
     val scope = rememberCoroutineScope()
     val snack = remember { SnackbarHostState() }
+    var isSyncing by remember{mutableStateOf(false)}
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snack) },
         bottomBar = {
             Column() {
                 BottomNavigationBar(navController)
@@ -218,11 +216,9 @@ fun Home(navController: NavController) {
                             modifier = Modifier.padding(bottom = 8.dp),
                             textAlign = TextAlign.Center
                         )
-
-
                     }
 
-                    if (pendingCountSync > 0) {
+                    if (pendingCountSync > 0 && !isSyncing) {
                         AlertSyncBanner(pendingCountSync, "sin subir a la nube", Color(0xFFED9121) )
                     }
 
@@ -233,20 +229,23 @@ fun Home(navController: NavController) {
                     Spacer(modifier = Modifier.height(14.dp))
 
                     Button(
-                        enabled = pendingCountSync > 0,
+                        enabled = pendingCountSync > 0 && !isSyncing,
                         onClick = {
                             scope.launch {
+                                isSyncing = true
                                 val result = syncAllPending(
-                                    api = appContainer.authApiService,  // Asegúrate de exponerlo en tu container
+                                    api = appContainer.authApiService,
                                     repo = appContainer.formulariosRepository,
                                     forms1, forms2, forms3, forms4, forms5, forms6, forms7
                                 )
+                                isSyncing = false
                                 val msg = if (result.errors.isEmpty()) {
-                                    "Sincronizados: ${result.successCount}"
+                                    "Se sincronizo: ${result.successCount} formularios"
                                 } else {
                                     "Sincronizados: ${result.successCount}. Errores: ${result.errors.size}"
                                 }
-                                snack.showSnackbar(msg)
+                                snack.showSnackbar(message = msg,
+                                    withDismissAction = true)
                             }
                         }
                     ) {
@@ -264,7 +263,6 @@ fun Home(navController: NavController) {
 
                         StatsColumn(label = "Total", count = userTotal, color = Color.Black)
                     }
-
 
                     // Forms Grid
                     LazyVerticalGrid(
