@@ -67,6 +67,9 @@ import androidx.compose.material3.SnackbarHostState
 import com.example.awaq1.data.syncAllPending
 import com.example.awaq1.ui.theme.components.AlertSyncBanner
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.firstOrNull
+import android.net.Uri
+import kotlinx.coroutines.flow.firstOrNull
 
 @Composable
 fun Home(navController: NavController) {
@@ -237,9 +240,26 @@ fun Home(navController: NavController) {
                         onClick = {
                             scope.launch {
                                 val result = syncAllPending(
-                                    api = appContainer.authApiService,  // Asegúrate de exponerlo en tu container
+                                    context = context,                                  // <--- agrega este
+                                    api = appContainer.authApiService,
+                                    remoteRepo = appContainer.formulariosRemoteRepository,
                                     repo = appContainer.formulariosRepository,
-                                    forms1, forms2, forms3, forms4, forms5, forms6, forms7
+                                    forms1, forms2, forms3, forms4, forms5, forms6, forms7,
+                                    imageResolver = { formId, localId ->
+                                        val formType = "Formulario$formId"
+                                        try {
+                                            kotlinx.coroutines.runBlocking {
+                                                appContainer.formulariosRepository
+                                                    .getImagesByFormulario(localId, formType)
+                                                    .firstOrNull()
+                                                    ?.firstOrNull()
+                                                    ?.imageUri
+                                                    ?.let(Uri::parse)
+                                            }
+                                        } catch (_: Exception) {
+                                            null
+                                        }
+                                    }
                                 )
                                 val msg = if (result.errors.isEmpty()) {
                                     "Sincronizados: ${result.successCount}"

@@ -21,7 +21,7 @@ object RetrofitClient {
 
     fun create(tokenManager: TokenManager): AuthApiService {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = HttpLoggingInterceptor.Level.HEADERS
         }
 
 

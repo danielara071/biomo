@@ -1,14 +1,19 @@
 package com.example.awaq1.data
 
+import android.content.Context
+import android.net.Uri
 import com.example.awaq1.data.formularios.*
 import com.example.awaq1.data.formularios.FormulariosRepository
 import com.example.awaq1.data.remote.AuthApiService
+import com.example.awaq1.data.remote.FormulariosRemoteRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 suspend fun syncAllPending(
+    context: Context,
     api: AuthApiService,
+    remoteRepo: FormulariosRemoteRepository,
     repo: FormulariosRepository,
     forms1: List<FormularioUnoEntity>,
     forms2: List<FormularioDosEntity>,
@@ -17,28 +22,37 @@ suspend fun syncAllPending(
     forms5: List<FormularioCincoEntity>,
     forms6: List<FormularioSeisEntity>,
     forms7: List<FormularioSieteEntity>,
+    imageResolver: (formId: Int, localId: Long) -> Uri?
 ): SyncResult = withContext(Dispatchers.IO) {
 
     var ok = 0
     val errs = mutableListOf<String>()
 
-    suspend fun <T> pushEach(
+    suspend fun <T : Any> pushEach(
         items: List<T>,
-        send: suspend (T) -> Boolean,
-        markSynced: suspend (T) -> Unit,
-        typeName: String
+        formId: Int,
+        isComplete: (T) -> Boolean,
+        getLocalId: (T) -> Long,
+        markSynced: suspend (T) -> Unit
     ) {
         for (item in items) {
+            if (!isComplete(item)) continue
             try {
-                val success = send(item)
-                if (success) {
+                val localId = getLocalId(item)
+                val imgUri = imageResolver(formId, localId)   // puede ser null
+                val result = remoteRepo.sendFormularioConImagen(
+                    formId = formId,
+                    imageUri = imgUri,
+                    metadataEntity = item
+                )
+                if (result.isSuccess) {
                     markSynced(item)
                     ok++
                 } else {
-                    errs += "Fallo $typeName"
+                    errs += "Fallo Formulario$formId (id=$localId)"
                 }
             } catch (e: Exception) {
-                errs += "Error $typeName: ${e.message}"
+                errs += "Error Formulario$formId: ${e.message}"
             }
         }
     }
@@ -52,6 +66,7 @@ suspend fun syncAllPending(
     val p6 = forms6.filter { it.esCompleto() && !it.synced }
     val p7 = forms7.filter { it.esCompleto() && !it.synced }
 
+    /*
     // Un "send" por tipo, mapeado a tu AuthApiService
     // (devuelve true si Response.isSuccessful)
     suspend fun send1(x: FormularioUnoEntity) =
@@ -69,6 +84,8 @@ suspend fun syncAllPending(
     suspend fun send7(x: FormularioSieteEntity) =
         api.sendFormularioSiete(x).isSuccessful
 
+     */
+
     // Cómo marcar synced = true usando tu repositorio
     suspend fun mark1(x: FormularioUnoEntity) { x.synced = true; repo.updateFormularioUno(x) }
     suspend fun mark2(x: FormularioDosEntity) { x.synced = true; repo.updateFormularioDos(x) }
@@ -79,13 +96,61 @@ suspend fun syncAllPending(
     suspend fun mark7(x: FormularioSieteEntity) { x.synced = true; repo.updateFormularioSiete(x) }
 
     // Empujar cada tipo solo si existe endpoint (1..7)
-    pushEach(p1, ::send1, ::mark1, "Formulario1")
-    pushEach(p2, ::send2, ::mark2, "Formulario2")
-    pushEach(p3, ::send3, ::mark3, "Formulario3")
-    pushEach(p4, ::send4, ::mark4, "Formulario4")
-    pushEach(p5, ::send5, ::mark5, "Formulario5")
-    pushEach(p6, ::send6, ::mark6, "Formulario6")
-    pushEach(p7, ::send7, ::mark7, "Formulario7")
+    pushEach(
+        items = forms1.filter { it.esCompleto() && !it.synced },
+        formId = 1,
+        isComplete = { (it as FormularioUnoEntity).esCompleto() },
+        getLocalId = { (it as FormularioUnoEntity).id },
+        markSynced = { x -> (x as FormularioUnoEntity).synced = true; repo.updateFormularioUno(x) }
+    )
+
+    pushEach(
+        items = forms2.filter { it.esCompleto() && !it.synced },
+        formId = 2,
+        isComplete = { (it as FormularioDosEntity).esCompleto() },
+        getLocalId = { (it as FormularioDosEntity).id },
+        markSynced = { x -> (x as FormularioDosEntity).synced = true; repo.updateFormularioDos(x) }
+    )
+
+    pushEach(
+        items = forms3.filter { it.esCompleto() && !it.synced },
+        formId = 3,
+        isComplete = { (it as FormularioTresEntity).esCompleto() },
+        getLocalId = { (it as FormularioTresEntity).id },
+        markSynced = { x -> (x as FormularioTresEntity).synced = true; repo.updateFormularioTres(x) }
+    )
+
+    pushEach(
+        items = forms4.filter { it.esCompleto() && !it.synced },
+        formId = 4,
+        isComplete = { (it as FormularioCuatroEntity).esCompleto() },
+        getLocalId = { (it as FormularioCuatroEntity).id },
+        markSynced = { x -> (x as FormularioCuatroEntity).synced = true; repo.updateFormularioCuatro(x) }
+    )
+
+    pushEach(
+        items = forms5.filter { it.esCompleto() && !it.synced },
+        formId = 5,
+        isComplete = { (it as FormularioCincoEntity).esCompleto() },
+        getLocalId = { (it as FormularioCincoEntity).id },
+        markSynced = { x -> (x as FormularioCincoEntity).synced = true; repo.updateFormularioCinco(x) }
+    )
+
+    pushEach(
+        items = forms6.filter { it.esCompleto() && !it.synced },
+        formId = 6,
+        isComplete = { (it as FormularioSeisEntity).esCompleto() },
+        getLocalId = { (it as FormularioSeisEntity).id },
+        markSynced = { x -> (x as FormularioSeisEntity).synced = true; repo.updateFormularioSeis(x) }
+    )
+
+    pushEach(
+        items = forms7.filter { it.esCompleto() && !it.synced },
+        formId = 7,
+        isComplete = { (it as FormularioSieteEntity).esCompleto() },
+        getLocalId = { (it as FormularioSieteEntity).id },
+        markSynced = { x -> (x as FormularioSieteEntity).synced = true; repo.updateFormularioSiete(x) }
+    )
 
     SyncResult(ok, errs)
 }

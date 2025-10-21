@@ -6,6 +6,7 @@ import com.example.awaq1.data.formularios.OfflineFormulariosRepository
 import com.example.awaq1.data.local.TokenManager
 import com.example.awaq1.data.remote.AuthApiService
 import com.example.awaq1.data.remote.OfflineAuthRepository
+import com.example.awaq1.data.remote.FormulariosRemoteRepository
 //import com.example.awaq1.data.remote.FormulariosRemoteRepository
 import com.example.awaq1.data.remote.RetrofitClient
 import com.example.awaq1.data.usuario.UsuariosRepository
@@ -17,6 +18,8 @@ interface AppContainer {
     //val formulariosRemoteRepository: FormulariosRemoteRepository
     val authApiService: AuthApiService
     val offlineAuthRepository: OfflineAuthRepository
+
+    val formulariosRemoteRepository: FormulariosRemoteRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -70,11 +73,11 @@ class AppDataContainer(private val context: Context) : AppContainer {
         )
     }
 
-    /*
+
     override val formulariosRemoteRepository: FormulariosRemoteRepository by lazy {
-        FormulariosRemoteRepository(authApiService)
+        FormulariosRemoteRepository(authApiService, context)
     }
 
-     */
+
 }
 
