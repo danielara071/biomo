@@ -110,7 +110,10 @@ fun AppNavigator(
             ObservationListScreen(navController = navController)
         }
         composable("home") {
-            Home(navController = navController)
+            Home(
+                navController = navController,
+                offlineAuthRepository = offlineAuthRepository
+            )
         }
     }
 }

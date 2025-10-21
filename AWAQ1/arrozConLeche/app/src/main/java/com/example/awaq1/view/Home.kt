@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.awaq1.data.remote.OfflineAuthRepository
 import com.example.awaq1.MainActivity
 import com.example.awaq1.data.formularios.FormularioCincoEntity
 import com.example.awaq1.data.formularios.FormularioCuatroEntity
@@ -72,11 +74,23 @@ import android.net.Uri
 import kotlinx.coroutines.flow.firstOrNull
 
 @Composable
-fun Home(navController: NavController) {
+fun Home(
+    navController: NavController,
+    offlineAuthRepository: OfflineAuthRepository? = null
+) {
     val context = LocalContext.current as MainActivity
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     var query by remember { mutableStateOf("") }
+    var isOfflineMode by remember { mutableStateOf(false) }
     val ubicacion = Ubicacion(context)
+    
+    // Check if user is in offline mode
+    LaunchedEffect(Unit) {
+        offlineAuthRepository?.isOfflineMode()?.collect { offline ->
+            isOfflineMode = offline
+        }
+    }
+    
     if(location == null){
         LaunchedEffect(Unit) {
             context.requestLocationPermission()
@@ -236,41 +250,55 @@ fun Home(navController: NavController) {
                     Spacer(modifier = Modifier.height(14.dp))
 
                     Button(
-                        enabled = pendingCountSync > 0,
+                        enabled = pendingCountSync > 0 && !isOfflineMode,
                         onClick = {
-                            scope.launch {
-                                val result = syncAllPending(
-                                    context = context,                                  // <--- agrega este
-                                    api = appContainer.authApiService,
-                                    remoteRepo = appContainer.formulariosRemoteRepository,
-                                    repo = appContainer.formulariosRepository,
-                                    forms1, forms2, forms3, forms4, forms5, forms6, forms7,
-                                    imageResolver = { formId, localId ->
-                                        val formType = "Formulario$formId"
-                                        try {
-                                            kotlinx.coroutines.runBlocking {
-                                                appContainer.formulariosRepository
-                                                    .getImagesByFormulario(localId, formType)
-                                                    .firstOrNull()
-                                                    ?.firstOrNull()
-                                                    ?.imageUri
-                                                    ?.let(Uri::parse)
+                            if (!isOfflineMode) {
+                                scope.launch {
+                                    val result = syncAllPending(
+                                        context = context,                                  // <--- agrega este
+                                        api = appContainer.authApiService,
+                                        remoteRepo = appContainer.formulariosRemoteRepository,
+                                        repo = appContainer.formulariosRepository,
+                                        forms1, forms2, forms3, forms4, forms5, forms6, forms7,
+                                        imageResolver = { formId, localId ->
+                                            val formType = "Formulario$formId"
+                                            try {
+                                                kotlinx.coroutines.runBlocking {
+                                                    appContainer.formulariosRepository
+                                                        .getImagesByFormulario(localId, formType)
+                                                        .firstOrNull()
+                                                        ?.firstOrNull()
+                                                        ?.imageUri
+                                                        ?.let(Uri::parse)
+                                                }
+                                            } catch (_: Exception) {
+                                                null
                                             }
-                                        } catch (_: Exception) {
-                                            null
                                         }
+                                    )
+                                    val msg = if (result.errors.isEmpty()) {
+                                        "Sincronizados: ${result.successCount}"
+                                    } else {
+                                        "Sincronizados: ${result.successCount}. Errores: ${result.errors.size}"
                                     }
-                                )
-                                val msg = if (result.errors.isEmpty()) {
-                                    "Sincronizados: ${result.successCount}"
-                                } else {
-                                    "Sincronizados: ${result.successCount}. Errores: ${result.errors.size}"
+                                    snack.showSnackbar(msg)
                                 }
-                                snack.showSnackbar(msg)
                             }
-                        }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isOfflineMode) Color.Gray else Color(0xFF4E7029),
+                            contentColor = if (isOfflineMode) Color.White.copy(alpha = 0.6f) else Color.White
+                        )
                     ) {
-                        Text(text = if (pendingCountSync > 0) "Sincronizar ($pendingCountSync)" else "Sincronizar")
+                        Text(
+                            text = if (isOfflineMode) {
+                                "Sincronizar (Modo Offline)"
+                            } else if (pendingCountSync > 0) {
+                                "Sincronizar ($pendingCountSync)"
+                            } else {
+                                "Sincronizar"
+                            }
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))
