@@ -63,7 +63,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AWAQ1Theme {
-                PrincipalView(modifier = Modifier, authRepository = authRepository)
+                PrincipalView(
+                    modifier = Modifier, 
+                    authRepository = authRepository,
+                    offlineAuthRepository = container.offlineAuthRepository
+                )
             }
         }
     }

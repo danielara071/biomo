@@ -46,7 +46,7 @@ import com.example.awaq1.data.usuario.UsuarioFormulario7Entity
         FormularioCincoEntity::class,FormularioSeisEntity::class,FormularioSieteEntity::class,ImageEntity::class,UsuarioEntity::class, UsuarioFormulario1Entity::class,
         UsuarioFormulario2Entity::class, UsuarioFormulario3Entity::class, UsuarioFormulario4Entity::class,
         UsuarioFormulario5Entity::class, UsuarioFormulario6Entity::class,UsuarioFormulario7Entity::class],
-    version = 6,
+    version = 7,
     exportSchema = true,
     autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3)]
 )

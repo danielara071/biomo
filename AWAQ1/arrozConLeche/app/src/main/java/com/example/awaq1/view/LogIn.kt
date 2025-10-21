@@ -3,6 +3,7 @@ package com.example.awaq1.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,19 +40,28 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import com.example.awaq1.MainActivity
 import com.example.awaq1.data.remote.AuthRepository
+import com.example.awaq1.data.remote.OfflineAuthRepository
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun LogIn(
     authRepository: AuthRepository,
+    offlineAuthRepository: OfflineAuthRepository,
     onLoginSuccess: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var offlineKey by remember { mutableStateOf("") }
+    var isOfflineMode by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
@@ -59,9 +69,30 @@ fun LogIn(
         errorMessage = null
         scope.launch {
             try {
-                // Llama a tu backend (guarda el token en TokenManager)
-                authRepository.signIn(username, password)
-                onLoginSuccess(username)
+                if (isOfflineMode) {
+                    // Check if there are any offline users first
+                    val hasOfflineUsers = offlineAuthRepository.hasAnyOfflineUsers()
+                    if (!hasOfflineUsers) {
+                        errorMessage = "No hay usuarios con acceso offline. Debes iniciar sesión online primero."
+                    } else {
+                        val success = offlineAuthRepository.signInOffline(offlineKey)
+                        if (success) {
+                            // Get the actual username for this offline key
+                            val offlineUsername = offlineAuthRepository.signInOfflineWithUsername(offlineKey)
+                            if (offlineUsername != null) {
+                                onLoginSuccess(offlineUsername)
+                            } else {
+                                errorMessage = "No se encontró el usuario asociado con esta clave offline."
+                            }
+                        } else {
+                            errorMessage = "Clave offline inválida o no existe. Debe tener al menos 8 caracteres."
+                        }
+                    }
+                } else {
+                    // Llama a tu backend (guarda el token en TokenManager)
+                    authRepository.signIn(username, password)
+                    onLoginSuccess(username)
+                }
             } catch (e: Exception) {
                 errorMessage = e.message ?: "Error de autenticación."
             }
@@ -88,56 +119,125 @@ fun LogIn(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 150.dp)
             )
-            //Email
-            TextField (
-                value = username,
-                onValueChange = {username = it },
-                label = { Text("Email") },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+            
+            // Offline Mode Toggle
+            Card(
                 modifier = Modifier
                     .padding(top = 20.dp)
-                    .fillMaxWidth()
-            )
-            //Contraseña
-
-            var passwordVisible by remember { mutableStateOf(false) }
-
-            TextField (
-                value = password,
-                onValueChange = {password = it },
-                label = { Text("Contraseña") },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                singleLine = true,
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        doSignIn()
-                    }
-                ),
-                modifier = Modifier
-                    .padding(top = 10.dp)
                     .fillMaxWidth(),
-                trailingIcon = {
-                    val image = if (passwordVisible)
-                        Icons.Filled.Visibility
-                    else Icons.Filled.VisibilityOff
-
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(
-                            imageVector = image,
-                            contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
-                        )
-                    }
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.9f)
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = isOfflineMode,
+                        onCheckedChange = { 
+                            isOfflineMode = it
+                            if (it) {
+                                // Generate offline key when switching to offline mode
+                                scope.launch {
+                                    offlineKey = offlineAuthRepository.generateOfflineKey()
+                                }
+                            } else {
+                                offlineKey = ""
+                            }
+                        }
+                    )
+                    Text(
+                        text = "Modo Offline",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black
+                    )
                 }
-            )
-            //Olvidaste Contraseña
-            Text(text = stringResource(R.string.forgot_password),
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(top = 6.dp),
-                color = Color(0xFF4E7029),
-                fontWeight = FontWeight.Bold,
-            )
+            }
+            if (isOfflineMode) {
+                // Offline Key Field
+                TextField(
+                    value = offlineKey,
+                    onValueChange = { offlineKey = it },
+                    label = { Text("Clave Offline") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            doSignIn()
+                        }
+                    ),
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .fillMaxWidth()
+                )
+                Text(
+                    text = "Tu clave offline: $offlineKey",
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                Text(
+                    text = "Nota: Solo puedes usar modo offline si ya has iniciado sesión antes.",
+                    fontSize = 10.sp,
+                    color = Color(0xFFFF9800),
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            } else {
+                //Email
+                TextField (
+                    value = username,
+                    onValueChange = {username = it },
+                    label = { Text("Email") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .fillMaxWidth()
+                )
+                //Contraseña
+
+                var passwordVisible by remember { mutableStateOf(false) }
+
+                TextField (
+                    value = password,
+                    onValueChange = {password = it },
+                    label = { Text("Contraseña") },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    singleLine = true,
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            doSignIn()
+                        }
+                    ),
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .fillMaxWidth(),
+                    trailingIcon = {
+                        val image = if (passwordVisible)
+                            Icons.Filled.Visibility
+                        else Icons.Filled.VisibilityOff
+
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = image,
+                                contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                            )
+                        }
+                    }
+                )
+            }
+            //Olvidaste Contraseña (only show in online mode)
+            if (!isOfflineMode) {
+                Text(text = stringResource(R.string.forgot_password),
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(top = 6.dp),
+                    color = Color(0xFF4E7029),
+                    fontWeight = FontWeight.Bold,
+                )
+            }
             //Entrar
             Button(onClick = {
                 doSignIn()

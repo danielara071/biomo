@@ -42,6 +42,15 @@ interface UsuarioDAO {
 
     @Query("UPDATE Usuarios SET lastLogin = :lastLogin WHERE id = :userId")
     suspend fun updateLastLogin(userId: Long, lastLogin: String)
+
+    @Query("SELECT id FROM Usuarios WHERE offlineKey = :offlineKey")
+    suspend fun getUserIdByOfflineKey(offlineKey: String): Long?
+
+    @Query("UPDATE Usuarios SET offlineKey = :offlineKey WHERE id = :userId")
+    suspend fun updateOfflineKey(userId: Long, offlineKey: String)
+
+    @Query("SELECT offlineKey FROM Usuarios WHERE id = :userId")
+    suspend fun getOfflineKeyByUserId(userId: Long): String?
 }
 
 // DAO for UsuarioFormulario1Entity
