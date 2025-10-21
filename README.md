@@ -92,9 +92,8 @@ Biomo/arrozConLeche/
 ## Comenzar
 
 1. Clona el repositorio
-2. Abre el proyecto en Android Studio
-3. Configura las credenciales de Auth0 en `strings.xml`
-4. Construye y ejecuta la aplicación
+2. Abre el proyecto en Android Studio -- asegúrate de abrir la carpeta "arrozConLeche" dentro del folder AWAQ1
+3. Construye y ejecuta la aplicación. Puede que tarde el proceso de importación del Gradle por las dependencias; esto es normal.
 
 ## Modelos de Datos
 
