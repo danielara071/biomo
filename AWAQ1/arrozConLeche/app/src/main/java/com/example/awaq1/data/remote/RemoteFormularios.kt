@@ -1,85 +1,75 @@
 package com.example.awaq1.data.remote
 
-import com.example.awaq1.data.formularios.FormularioCincoEntity
-import com.example.awaq1.data.formularios.FormularioCuatroEntity
-import com.example.awaq1.data.formularios.FormularioDosEntity
-import com.example.awaq1.data.formularios.FormularioSeisEntity
-import com.example.awaq1.data.formularios.FormularioSieteEntity
-import com.example.awaq1.data.formularios.FormularioTresEntity
-import com.example.awaq1.data.formularios.FormularioUnoEntity
 
-/*
-class FormulariosRemoteRepository(private val api: AuthApiService) {
-    suspend fun enviarFormularioUno(form: FormularioUnoEntity): Result<Unit> {
-        return try {
-            val r = api.sendFormularioUno(form)
-            if (r.isSuccessful) Result.success(Unit)
-            else Result.failure(Exception("HTTP ${r.code()} ${r.message()}"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+import android.content.Context
+import android.net.Uri
+import android.util.Log
+import com.google.gson.Gson
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.HttpException
 
-    suspend fun enviarFormularioDos(form: FormularioDosEntity): Result<Unit> {
-        return try {
-            val r = api.sendFormularioDos(form)
-            if (r.isSuccessful) Result.success(Unit)
-            else Result.failure(Exception("HTTP ${r.code()} ${r.message()}"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 
-    suspend fun enviarFormularioTres(form: FormularioTresEntity): Result<Unit> {
-        return try {
-            val r = api.sendFormularioTres(form)
-            if (r.isSuccessful) Result.success(Unit)
-            else Result.failure(Exception("HTTP ${r.code()} ${r.message()}"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+class FormulariosRemoteRepository(
+    private val api: AuthApiService,
+    private val appContext: Context
+) {
+    suspend fun sendFormularioConImagen(
+        formId: Int,
+        imageUri: Uri?,
+        metadataEntity: Any
+    ): Result<FormularioResponse> = try {
 
-    suspend fun enviarFormularioCuatro(form: FormularioCuatroEntity): Result<Unit> {
-        return try {
-            val r = api.sendFormularioCuatro(form)
-            if (r.isSuccessful) Result.success(Unit)
-            else Result.failure(Exception("HTTP ${r.code()} ${r.message()}"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+        // 🔹 Usa SOLO el metadata limpio (sin id, formId, synced)
+        val metadataBody = metadataBodyFromEntitySafe(metadataEntity)
 
-    suspend fun enviarFormularioCinco(form: FormularioCincoEntity): Result<Unit> {
-        return try {
-            val r = api.sendFormularioCinco(form)
-            if (r.isSuccessful) Result.success(Unit)
-            else Result.failure(Exception("HTTP ${r.code()} ${r.message()}"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+        Log.d("Upload", "== PREPARANDO POST ==")
+        Log.d("Upload", "formId = $formId")
+        Log.d("Upload", "metadata.clean (final) listo para envío")
 
-    suspend fun enviarFormularioSeis(form: FormularioSeisEntity): Result<Unit> {
-        return try {
-            val r = api.sendFormularioSeis(form)
-            if (r.isSuccessful) Result.success(Unit)
-            else Result.failure(Exception("HTTP ${r.code()} ${r.message()}"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+        // 🔹 Prepara IMAGEN como archivo (jpg/png)
+        val imagePart = imageUri?.let { uri ->
+            val resolver = appContext.contentResolver
+            val type = resolver.getType(uri) ?: "image/jpeg"
+            Log.d("Upload", "imageUri = $uri")
+            Log.d("Upload", "image ContentType = $type")
 
-    suspend fun enviarFormularioSiete(form: FormularioSieteEntity): Result<Unit> {
-        return try {
-            val r = api.sendFormularioSiete(form)
-            if (r.isSuccessful) Result.success(Unit)
-            else Result.failure(Exception("HTTP ${r.code()} ${r.message()}"))
-        } catch (e: Exception) {
-            Result.failure(e)
+            val bytes = resolver.openInputStream(uri)?.use { it.readBytes() } ?: ByteArray(0)
+            Log.d("Upload", "image size = ${bytes.size} bytes")
+
+            val ext = when {
+                type.contains("png", ignoreCase = true) -> "png"
+                else -> "jpg"
+            }
+            val body = bytes.toRequestBody(type.toMediaType())
+            MultipartBody.Part.createFormData("image", "photo.$ext", body)
         }
+
+        Log.d("Upload", "== ENVIANDO POST ==")
+
+        val resp = api.sendFormularioConImagen(
+            formId = formId,
+            image = imagePart,
+            metadata = metadataBody // ← usa el limpio
+        )
+
+        Log.d("Upload", "== RESPUESTA ==")
+        Log.d("Upload", "code = ${resp.code()} message = ${resp.message()}")
+        Log.d("Upload", "body = ${resp.body()}")
+
+        if (!resp.isSuccessful) {
+            val err = resp.errorBody()?.string()
+            Log.e("Upload", "errorBody = $err")
+        }
+
+        if (resp.isSuccessful && resp.body() != null)
+            Result.success(resp.body()!!)
+        else
+            Result.failure(HttpException(resp))
+
+    } catch (t: Throwable) {
+        Log.e("Upload", "EXCEPCIÓN EN POST", t)
+        Result.failure(t)
     }
 }
-
-
- */
