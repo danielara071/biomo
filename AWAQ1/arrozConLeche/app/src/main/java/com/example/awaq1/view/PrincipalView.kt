@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +32,7 @@ import com.example.awaq1.MainActivity
 import com.example.awaq1.R
 import com.example.awaq1.data.AccountInfo
 import com.example.awaq1.data.remote.AuthRepository
+import com.example.awaq1.data.remote.OfflineAuthRepository
 import com.example.awaq1.data.usuario.UsuarioEntity
 import com.example.awaq1.navigator.AppNavigator
 import kotlinx.coroutines.Dispatchers
@@ -58,11 +60,34 @@ suspend fun setAccountInfoOnLogin(context: MainActivity, username: String) {
 @Composable
 fun PrincipalView(
     modifier: Modifier = Modifier,
-    authRepository: AuthRepository
+    authRepository: AuthRepository,
+    offlineAuthRepository: OfflineAuthRepository
 ) {
     var loggedIn by remember { mutableStateOf(false) }
+    var isOfflineMode by remember { mutableStateOf(false) }
     val context = LocalContext.current as MainActivity
     val scope = rememberCoroutineScope()
+
+    // Check if user is in offline mode on startup
+    LaunchedEffect(Unit) {
+        offlineAuthRepository.isOfflineMode().collect { offline ->
+            isOfflineMode = offline
+            if (offline) {
+                // Get the offline key and find the user
+                offlineAuthRepository.getOfflineKey().collect { key ->
+                    key?.let { offlineKey ->
+                        scope.launch {
+                            val username = offlineAuthRepository.signInOfflineWithUsername(offlineKey)
+                            username?.let { user ->
+                                setAccountInfoOnLogin(context, user)
+                                loggedIn = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         //context.accountInfo = AccountInfo("example@example.com", user_id = 1L)
@@ -71,13 +96,20 @@ fun PrincipalView(
                 onLogout = {
                     loggedIn = false
                 },
+                offlineAuthRepository = offlineAuthRepository,
                 Modifier.padding(innerPadding))
         } else {
             LogIn(
                 authRepository = authRepository,
+                offlineAuthRepository = offlineAuthRepository,
                 onLoginSuccess =  { username ->
                     scope.launch {
                         setAccountInfoOnLogin(context, username)
+                        // Generate offline key for this user after successful login
+                        val userId = context.container.usuariosRepository.getUserIdByUsername(username)
+                        userId?.let { id ->
+                            offlineAuthRepository.generateOfflineKeyForUser(id)
+                        }
                         loggedIn = true
                     }
                 },

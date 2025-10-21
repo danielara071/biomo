@@ -57,6 +57,12 @@ class UsuariosRepository(
 
     suspend fun updateLastLogin(userId: Long, lastLogin: String) = usuarioDAO.updateLastLogin(userId, lastLogin)
 
+    suspend fun getUserIdByOfflineKey(offlineKey: String): Long? = usuarioDAO.getUserIdByOfflineKey(offlineKey)
+
+    suspend fun updateOfflineKey(userId: Long, offlineKey: String) = usuarioDAO.updateOfflineKey(userId, offlineKey)
+
+    suspend fun getOfflineKeyByUserId(userId: Long): String? = usuarioDAO.getOfflineKeyByUserId(userId)
+
 
     // UsuarioFormulario1 operations (associations)
     @Transaction

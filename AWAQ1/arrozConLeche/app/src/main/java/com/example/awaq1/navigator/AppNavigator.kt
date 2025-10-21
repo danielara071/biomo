@@ -12,6 +12,7 @@ import androidx.navigation.toRoute
 import com.example.awaq1.view.AboutUs
 import com.example.awaq1.view.Home
 import com.example.awaq1.view.Mapa
+import com.example.awaq1.view.ProfileView
 import com.example.awaq1.view.formularios.ObservationForm
 import com.example.awaq1.view.formularios.ObservationFormCinco
 import com.example.awaq1.view.formularios.ObservationFormDos
@@ -22,6 +23,7 @@ import com.example.awaq1.view.formularios.ObservationFormTres
 import com.example.awaq1.view.SelectFormularioScreen
 import com.example.awaq1.view.Settings
 import com.example.awaq1.view.TwoFactor
+import com.example.awaq1.data.remote.OfflineAuthRepository
 import kotlinx.serialization.Serializable
 
 @Serializable data class FormUnoID(val form_id: Long = 0)
@@ -40,7 +42,11 @@ import kotlinx.serialization.Serializable
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun AppNavigator(onLogout: () -> Unit, modifier: Modifier = Modifier) {
+fun AppNavigator(
+    onLogout: () -> Unit, 
+    offlineAuthRepository: OfflineAuthRepository,
+    modifier: Modifier = Modifier
+) {
     val navController = rememberNavController()
     //val startDestination = if (loggedIn) "home" else "log_in"
     val startDestination = "home"
@@ -59,7 +65,10 @@ fun AppNavigator(onLogout: () -> Unit, modifier: Modifier = Modifier) {
             Settings(navController = navController, onLogout)
         }
         composable("perfil") {
-            UserSettingsScreen(navController = navController)
+            UserSettingsScreen(
+                navController = navController,
+                offlineAuthRepository = offlineAuthRepository
+            )
         }
 
         composable("elegir_reporte") {
