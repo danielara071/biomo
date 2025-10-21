@@ -1,6 +1,7 @@
 package com.example.awaq1.data.remote
 
 
+import com.example.awaq1.data.formularios.FormularioUnoEntity
 import retrofit2.http.Header
 
 data class AuthRequest(
@@ -16,6 +17,8 @@ data class AuthResponse(
 data class FormularioResponse(
     val message: String,
 )
+
+
 
 data class ProfileResponse(
     val message: String,
