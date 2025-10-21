@@ -75,6 +75,7 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
     val savedImageUris = remember { mutableStateOf(mutableListOf<Uri>()) }
     val cameraViewModel: CameraViewModel = viewModel()
 
+    var readOnly by remember { mutableStateOf(false) }
     var codigo: String by remember { mutableStateOf("") }
     var clima by remember { mutableStateOf("") }
     var temporada by remember { mutableStateOf("Verano/Seca") }
@@ -100,6 +101,7 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
         }
 
         if (formulario != null) {
+            readOnly = formulario.synced
             codigo = formulario.codigo
             clima = formulario.clima
             temporada = formulario.temporada
@@ -199,7 +201,19 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
+                    )
+                    {
+                        if (readOnly) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color(0xFFFFF3CD), RoundedCornerShape(8.dp))
+                                    .padding(12.dp)
+                            ) {
+                                Text("Formulario subido: solo lectura", color = Color(0xFF856404))
+                            }
+                        }
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -234,6 +248,7 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                             value = codigo,
                             onValueChange = { codigo = it },
                             label = { Text("Código") },
+                            enabled = !readOnly,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -254,7 +269,8 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                             weatherOptions.forEachIndexed { index, option ->
                                 IconToggleButton(
                                     checked = clima == option,
-                                    onCheckedChange = { clima = option },
+                                    onCheckedChange = { if(!readOnly) clima = option },
+                                    enabled = !readOnly,
                                     modifier = Modifier.size(150.dp)
                                 ) {
                                     Box(
@@ -286,7 +302,8 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     RadioButton(
                                         selected = temporada == option,
-                                        onClick = { temporada = option },
+                                        onClick = { if(!readOnly) temporada = option },
+                                        enabled = !readOnly,
                                         colors = RadioButtonDefaults.colors(
                                             selectedColor = Color(0xFF4E7029),
                                             unselectedColor = Color.Gray
@@ -342,8 +359,9 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                                         text = opcion_QA,
                                         isSelected = quad_a == opcion_QA, // Check if this button is selected
                                         onClick = {
-                                            quad_a = opcion_QA // Update the selected option for group A
+                                            if(!readOnly) quad_a = opcion_QA // Update the selected option for group A
                                         },
+                                        enabled = !readOnly,
                                         size = 100.dp
                                     )
                                 }
@@ -381,8 +399,10 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                                         text = opcion_QB,
                                         isSelected = quad_b == opcion_QB, // Check if this button is selected
                                         onClick = {
-                                            quad_b = opcion_QB // Update the selected option for group B
-                                        }
+                                            if(!readOnly) quad_b = opcion_QB // Update the selected option for group B
+                                        },
+                                        enabled = !readOnly
+
                                     )
                                 }
                             }
@@ -424,8 +444,9 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                                     text = opcion_sub,
                                     isSelected = sub_quad == opcion_sub, // Check if this button is selected
                                     onClick = {
-                                        sub_quad = opcion_sub // Update the selected option for group A
-                                    }
+                                        if (!readOnly) sub_quad = opcion_sub // Update the selected option for group A
+                                    },
+                                    enabled = !readOnly
                                 )
                             }
                         }
@@ -440,7 +461,8 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     RadioButton(
                                         selected = habitoDeCrecimiento == option.first,
-                                        onClick = { habitoDeCrecimiento = option.first },
+                                        onClick = { if(!readOnly) habitoDeCrecimiento = option.first },
+                                        enabled = !readOnly,
                                         colors = RadioButtonDefaults.colors(
                                             selectedColor = Color(0xFF4E7029),
                                             unselectedColor = Color.Gray
@@ -454,54 +476,64 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                             value = nombreComun,
                             onValueChange = { nombreComun = it },
                             label = { Text("Nombre Común") },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !readOnly,
                         )
 
 			OutlinedTextField(
                             value = nombreCientifico,
                             onValueChange = { nombreCientifico = it },
                             label = { Text("Nombre Científico") },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !readOnly
+
                         )
-			
+
 			OutlinedTextField(
                             value = placa,
                             onValueChange = { placa = it },
                             label = { Text("Placa") },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !readOnly
                         )
 
 			OutlinedTextField(
                             value = circunferencia,
                             onValueChange = { circunferencia = it },
                             label = { Text("Circunferencia en cm") },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !readOnly
                         )
 
 			OutlinedTextField(
                             value = distancia,
                             onValueChange = { distancia = it },
                             label = { Text("Distancia en mt") },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !readOnly
                         )
 
 			OutlinedTextField(
                             value = estatura,
                             onValueChange = { estatura = it },
                             label = { Text("Estatura Biomonitor en mt") },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !readOnly
+
                         )
 
 			OutlinedTextField(
                             value = altura,
                             onValueChange = { altura = it },
                             label = { Text("Altura en mt") },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !readOnly
                         )
 
                         // Camera Button
                         Button(
-                            onClick = { showCamera = true },
+                            onClick = { if(!readOnly) showCamera = true },
+                            enabled = !readOnly,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF4E7029),
                                 contentColor = Color.White
@@ -511,7 +543,8 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Take Photo",
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
+
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Tomar Foto")
@@ -531,8 +564,10 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                                     modifier = Modifier.size(100.dp)
                                 )
                                 Button(onClick = {
-                                    savedImageUris.value = savedImageUris.value.toMutableList().apply { remove(uri) }
+                                    if(!readOnly)
+                                        savedImageUris.value = savedImageUris.value.toMutableList().apply { remove(uri) }
                                 },
+                                    enabled = !readOnly,
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color.Transparent // Removes background color
                                     ),
@@ -553,7 +588,8 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(100.dp),
-                            maxLines = 4
+                            maxLines = 4,
+                            enabled = !readOnly
                         )
 
                         Row(
@@ -582,6 +618,7 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
 
                             Button(
                                 onClick = {
+                                    if (readOnly) return@Button
                                     if (fecha.isNullOrEmpty()) {
                                         fecha = getCurrentDate()
                                     }
@@ -633,6 +670,7 @@ fun ObservationFormCuatro(navController: NavController, formularioId: Long = 0) 
                                     }
                                     navController.navigate("home")
                                 },
+                                enabled = !readOnly,
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(0xFF4E7029),
                                     contentColor = Color.White
@@ -661,7 +699,8 @@ fun SquareRadioButton(
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit,
-    size: Dp = 60.dp // Default size is 60.dp
+    size: Dp = 60.dp, // Default size is 60.dp
+    enabled: Boolean = true
 ) {
     Box(
         modifier = Modifier

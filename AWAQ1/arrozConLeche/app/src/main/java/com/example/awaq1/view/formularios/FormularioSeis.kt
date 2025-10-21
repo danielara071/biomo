@@ -75,6 +75,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     val ubicacion = Ubicacion(context)
 
+    var readOnly by remember { mutableStateOf(false) }
     var codigo by remember { mutableStateOf("") }
     var clima by remember { mutableStateOf("") }
     var temporada by remember { mutableStateOf("Verano/Seca") }
@@ -106,6 +107,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
         }
 
         if (formulario != null) {
+            readOnly = formulario.synced
             codigo = formulario.codigo
             zona = formulario.zona
             clima = formulario.clima
@@ -214,6 +216,18 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
+                        //banner readOnly
+                        if (readOnly) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color(0xFFFFF3CD), RoundedCornerShape(8.dp))
+                                    .padding(12.dp)
+                            ) {
+                                Text("Formulario subido: solo lectura", color = Color(0xFF856404))
+                            }
+                        }
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -248,6 +262,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                             value = codigo,
                             onValueChange = { codigo = it },
                             label = { Text("Código") },
+                            enabled = !readOnly,
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -260,15 +275,16 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                         ) {
                             val weatherOptions = listOf("Soleado", "Parcialmente Nublado", "Lluvioso")
                             val weatherIcons = listOf(
-                                R.drawable.sunny,
-                                R.drawable.cloudy,
-                                R.drawable.rainy
+                                R.drawable.sunny, // Add sunny icon in your drawable resources
+                                R.drawable.cloudy, // Add partly cloudy icon in your drawable resources
+                                R.drawable.rainy // Add rainy icon in your drawable resources
                             )
 
                             weatherOptions.forEachIndexed { index, option ->
                                 IconToggleButton(
                                     checked = clima == option,
-                                    onCheckedChange = { clima = option },
+                                    onCheckedChange = { if(!readOnly) clima = option },
+                                    enabled = !readOnly,
                                     modifier = Modifier.size(150.dp)
                                 ) {
                                     Box(
@@ -302,7 +318,8 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     RadioButton(
                                         selected = temporada == option,
-                                        onClick = { temporada = option },
+                                        onClick = { if(!readOnly) temporada = option },
+                                        enabled = !readOnly,
                                         colors = RadioButtonDefaults.colors(
                                             selectedColor = Color(0xFF4E7029),
                                             unselectedColor = Color.Gray
@@ -327,7 +344,8 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     RadioButton(
                                         selected = zona == option,
-                                        onClick = { zona = option },
+                                        onClick = { if(readOnly) zona = option },
+                                        enabled = !readOnly,
                                         colors = RadioButtonDefaults.colors(
                                             selectedColor = Color(0xFF4E7029),
                                             unselectedColor = Color.Gray
@@ -342,6 +360,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                             value = nombreCamara,
                             onValueChange = { nombreCamara = it },
                             label = { Text("Nombre Cámara") },
+                            enabled = !readOnly,
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -350,6 +369,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                             value = placaCamara,
                             onValueChange = { placaCamara = it },
                             label = { Text("Placa Cámara") },
+                            enabled = !readOnly,
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -358,6 +378,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                             value = placaGuaya,
                             onValueChange = { placaGuaya = it },
                             label = { Text("Placa Guaya") },
+                            enabled = !readOnly,
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -366,6 +387,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                             value = anchoCamino,
                             onValueChange = { anchoCamino = it },
                             label = { Text("Ancho Camino mt") },
+                            enabled = !readOnly,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -374,6 +396,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                         OutlinedTextField(
                             value = fechaInstalacion,
                             onValueChange = { fechaInstalacion = it },
+                            enabled = !readOnly,
                             label = { Text("Fecha de Instalación") },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -383,6 +406,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                             value = distanciaObjetivo,
                             onValueChange = { distanciaObjetivo = it },
                             label = { Text("Distancia al objetivo mt") },
+                            enabled = !readOnly,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -392,6 +416,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                             value = alturaLente,
                             onValueChange = { alturaLente = it },
                             label = { Text("Altura del lente mt") },
+                            enabled = !readOnly,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -402,14 +427,16 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(
                                     checked = checklistState[item] ?: false,
-                                    onCheckedChange = { isChecked -> checklistState[item] = isChecked }
+                                    onCheckedChange = { isChecked -> checklistState[item] = isChecked },
+                                    enabled = !readOnly,
                                 )
                                 Text(item, modifier = Modifier.padding(start = 8.dp))
                             }
                         }
                         // Camera Button
                         Button(
-                            onClick = { showCamera = true },
+                            onClick = { if(!readOnly) showCamera = true },
+                            enabled = !readOnly,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF4E7029),
                                 contentColor = Color.White
@@ -439,8 +466,9 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                                     modifier = Modifier.size(100.dp)
                                 )
                                 Button(onClick = {
-                                    savedImageUris.value = savedImageUris.value.toMutableList().apply { remove(uri) }
+                                    if(!readOnly) savedImageUris.value = savedImageUris.value.toMutableList().apply { remove(uri) }
                                 },
+                                    enabled = !readOnly,
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color.Transparent // Removes background color
                                     ),
@@ -456,6 +484,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
                             value = observaciones,
                             onValueChange = { observaciones = it },
                             label = { Text("Observaciones") },
+                            enabled = !readOnly,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(100.dp),
@@ -487,6 +516,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
 
                             Button(
                                 onClick = {
+                                    if (readOnly) return@Button
                                     if (fecha.isNullOrEmpty()) {
                                         fecha = getCurrentDate()
                                     }
@@ -539,6 +569,7 @@ fun ObservationFormSeis(navController: NavController, formularioId: Long = 0) {
 
                                     navController.navigate("home")
                                 },
+                                enabled = !readOnly,
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(0xFF4E7029),
                                     contentColor = Color.White

@@ -1,3 +1,4 @@
+// Archivo: FormularioTres.kt
 package com.example.awaq1.view.formularios
 
 import android.net.Uri
@@ -53,7 +54,6 @@ import com.example.awaq1.data.formularios.Ubicacion
 import com.example.awaq1.view.CameraWindow
 import kotlinx.coroutines.flow.first
 
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewForm3() {
@@ -72,6 +72,7 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
 
     val cameraViewModel: CameraViewModel = viewModel()
 
+    var readOnly by remember { mutableStateOf(false) }
     var codigo by remember { mutableStateOf("") }
     var clima by remember { mutableStateOf("") }
     var temporada by remember { mutableStateOf("Verano/Seca") }
@@ -80,11 +81,12 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
     var cobertura: String by remember { mutableStateOf("") }
     var tipoCultivo: String by remember { mutableStateOf("") }
     var disturbio: String by remember { mutableStateOf("") }
-    var observaciones: String by remember { mutableStateOf("") }
-    var showCamera by remember { mutableStateOf(false) }
-    val savedImageUris = remember { mutableStateOf(mutableListOf<Uri>()) }
+    var observaciones by remember { mutableStateOf("") }
     var fecha by remember { mutableStateOf("") }
     var editado by remember { mutableStateOf("") }
+
+    var showCamera by remember { mutableStateOf(false) }
+    val savedImageUris = remember { mutableStateOf(mutableListOf<Uri>()) }
 
     if (formularioId != 0L) {
         val formulario: FormularioTresEntity? = runBlocking {
@@ -93,6 +95,8 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
         }
 
         if (formulario != null) {
+            readOnly = formulario.synced
+
             codigo = formulario.codigo
             clima = formulario.clima
             temporada = formulario.temporada
@@ -106,43 +110,28 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
             editado = formulario.editado
             location = if (formulario.latitude != null && formulario.longitude != null) {
                 Pair(formulario.latitude, formulario.longitude)
-            } else {
-                null
-            }
-            // Load saved images
+            } else null
+
             val storedImages = runBlocking {
-                appContainer.formulariosRepository.getImagesByFormulario(formularioId, "Formulario3")
-                    .first() // Fetch the list of ImageEntity for this form
+                appContainer.formulariosRepository.getImagesByFormulario(formularioId, "Formulario3").first()
             }
-            // Convert image URIs from String to Uri and store them in savedImageUris
             savedImageUris.value = storedImages.mapNotNull { imageEntity ->
-                try {
-                    Uri.parse(imageEntity.imageUri) // Convert String to Uri
-                } catch (e: Exception) {
-                    Log.e("ObservationForm", "Failed to parse URI: ${imageEntity.imageUri}", e)
-                    null
-                }
+                try { Uri.parse(imageEntity.imageUri) } catch (_: Exception) { null }
             }.toMutableList()
         } else {
             Log.e("Formulario3Loading", "NO se pudo obtener el formulario3 con id $formularioId")
         }
     }
 
-    if(location == null){
+    if (location == null) {
         LaunchedEffect(Unit) {
             context.requestLocationPermission()
             if (ubicacion.hasLocationPermission()) {
                 location = ubicacion.obtenerCoordenadas()
-                if (location != null) {
-                    Log.d("ObservationForm", "Location retrieved: Lat=${location!!.first}, Long=${location!!.second}")
-                } else {
-                    Log.d("ObservationForm", "Location is null")
-                }
-            } else {
-                Log.d("ObservationForm", "Location permission required but not granted.")
             }
         }
     }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -168,15 +157,13 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
                 CameraWindow(
                     activity = context,
                     cameraViewModel = cameraViewModel,
-                    savedImageUris = savedImageUris, // Pass state
+                    savedImageUris = savedImageUris,
                     onClose = { showCamera = false },
-                    onGalleryClick = { /* Optional: Handle gallery selection */ }
+                    onGalleryClick = { }
                 )
-            }  else {
+            } else {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.White)
+                    modifier = Modifier.fillMaxSize().background(Color.White)
                 ) {
                     Column(
                         modifier = Modifier
@@ -186,71 +173,44 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFFF9F9F9), RoundedCornerShape(10.dp))
-                                .border(1.dp, Color(0xFF4E7029), RoundedCornerShape(10.dp))
-                                .padding(12.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Column {
-                                    Text("Ubicación Actual:", fontWeight = FontWeight.Bold, color = Color.Black)
-                                    Text(
-                                        text = location?.let { "Lati: ${it.first}\nLong: ${it.second}" }
-                                            ?: "Buscando ubicación...",
-                                        fontSize = 14.sp, color = Color.DarkGray
-                                    )
-                                }
 
-                                Image(
-                                    painter = painterResource(id = R.drawable.compass_icon),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(60.dp)
-                                )
-                            }
+                        if (readOnly) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color(0xFFFFF3CD), RoundedCornerShape(8.dp))
+                                    .padding(12.dp)
+                            ) { Text("Formulario subido: solo lectura", color = Color(0xFF856404)) }
                         }
-
 
                         OutlinedTextField(
                             value = codigo,
-                            onValueChange = { codigo = it },
+                            onValueChange = { if (!readOnly) codigo = it },
                             label = { Text("Código") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !readOnly
                         )
+
                         Text("Estado del Tiempo:")
-                        FlowRow (
+                        FlowRow(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceAround,
                             maxItemsInEachRow = 3
-                            //verticalAlignment = Alignment.CenterVertically
                         ) {
                             val weatherOptions = listOf("Soleado", "Parcialmente Nublado", "Lluvioso")
-                            val weatherIcons = listOf(
-                                R.drawable.sunny, // Add sunny icon in your drawable resources
-                                R.drawable.cloudy, // Add partly cloudy icon in your drawable resources
-                                R.drawable.rainy // Add rainy icon in your drawable resources
-                            )
-
+                            val weatherIcons = listOf(R.drawable.sunny, R.drawable.cloudy, R.drawable.rainy)
                             weatherOptions.forEachIndexed { index, option ->
                                 IconToggleButton(
                                     checked = clima == option,
-                                    onCheckedChange = { clima = option },
+                                    onCheckedChange = { if (!readOnly) clima = option },
+                                    enabled = !readOnly,
                                     modifier = Modifier.size(150.dp)
                                 ) {
                                     Box(
                                         modifier = Modifier
                                             .padding(8.dp)
-                                            .border(
-                                                width = 2.dp,
-                                                color = if (clima == option) Color(0xFF4E7029) else Color.Transparent,
-                                                shape = RoundedCornerShape(8.dp)
-                                            )
+                                            .border(2.dp, if (clima == option) Color(0xFF4E7029) else Color.Transparent, RoundedCornerShape(8.dp))
                                             .padding(8.dp)
                                     ) {
                                         Image(
@@ -262,229 +222,130 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
                                 }
                             }
                         }
+
                         Text("Época")
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
                             val seasonOptions = listOf("Verano/Seca", "Invierno/Lluviosa")
                             seasonOptions.forEach { option ->
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     RadioButton(
                                         selected = temporada == option,
-                                        onClick = { temporada = option },
-                                        colors = RadioButtonDefaults.colors(
-                                            selectedColor = Color(0xFF4E7029),
-                                            unselectedColor = Color.Gray
-                                        )
+                                        onClick = { if (!readOnly) temporada = option },
+                                        enabled = !readOnly,
+                                        colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF4E7029), unselectedColor = Color.Gray)
                                     )
                                     Text(option, modifier = Modifier.padding(start = 8.dp))
                                 }
                             }
                         }
-                        // SI o NO
+
+                        // Seguimiento y Cambio (Sí/No)
                         Text("Seguimiento")
-                        Column {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(
-                                    selected = seguimiento,
-                                    onClick = { seguimiento = true },
-                                    colors = RadioButtonDefaults.colors(
-                                        selectedColor = Color(0xFF4E7029),
-                                        unselectedColor = Color.Gray
-                                    )
-                                )
-                                Text("Sí", modifier = Modifier.padding(start = 8.dp))
-                            }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(
-                                    selected = !seguimiento,
-                                    onClick = { seguimiento = false },
-                                    colors = RadioButtonDefaults.colors(
-                                        selectedColor = Color(0xFF4E7029),
-                                        unselectedColor = Color.Gray
-                                    )
-                                )
-                                Text("No", modifier = Modifier.padding(start = 8.dp))
-                            }
+                        Row {
+                            RadioButton(
+                                selected = seguimiento,
+                                onClick = { if (!readOnly) seguimiento = true },
+                                enabled = !readOnly
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            RadioButton(
+                                selected = !seguimiento,
+                                onClick = { if (!readOnly) seguimiento = false },
+                                enabled = !readOnly
+                            )
                         }
 
-                        // SI o NO
-                        Text("Cambió")
-                        Column {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(
-                                    selected = cambio,
-                                    onClick = { cambio = true },
-                                    colors = RadioButtonDefaults.colors(
-                                        selectedColor = Color(0xFF4E7029),
-                                        unselectedColor = Color.Gray
-                                    )
-                                )
-                                Text("Sí", modifier = Modifier.padding(start = 8.dp))
-                            }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(
-                                    selected = !cambio,
-                                    onClick = { cambio = false },
-                                    colors = RadioButtonDefaults.colors(
-                                        selectedColor = Color(0xFF4E7029),
-                                        unselectedColor = Color.Gray
-                                    )
-                                )
-                                Text("No", modifier = Modifier.padding(start = 8.dp))
-                            }
-                        }
-
-                        Text("Cobertura")
-                        val coberturaOptions =
-                            listOf("BD", "RA", "RB", "PA", "PL", "CP", "CT", "VH", "TD", "IF")
-                        if (cobertura == "") {
-                            cobertura = coberturaOptions[0]
-                        }
-                        Column {
-                            coberturaOptions.forEach { option ->
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    RadioButton(
-                                        selected = cobertura == option,
-                                        onClick = { cobertura = option },
-                                        colors = RadioButtonDefaults.colors(
-                                            selectedColor = Color(0xFF4E7029),
-                                            unselectedColor = Color.Gray
-                                        )
-                                    )
-                                    Text(option, modifier = Modifier.padding(start = 8.dp))
-                                }
-                            }
+                        Text("Cambio")
+                        Row {
+                            RadioButton(
+                                selected = cambio,
+                                onClick = { if (!readOnly) cambio = true },
+                                enabled = !readOnly
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            RadioButton(
+                                selected = !cambio,
+                                onClick = { if (!readOnly) cambio = false },
+                                enabled = !readOnly
+                            )
                         }
 
                         OutlinedTextField(
+                            value = cobertura,
+                            onValueChange = { if (!readOnly) cobertura = it },
+                            label = { Text("Cobertura") },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !readOnly
+                        )
+                        OutlinedTextField(
                             value = tipoCultivo,
-                            onValueChange = { tipoCultivo = it },
-                            label = { Text("Tipos de cultivo") },
-                            // Es un numero lo de esta entrada?
-                            // keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            // TODO: Aclarar, cambiar schema si es necesario
-                            modifier = Modifier.fillMaxWidth()
+                            onValueChange = { if (!readOnly) tipoCultivo = it },
+                            label = { Text("Tipo de Cultivo") },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !readOnly
+                        )
+                        OutlinedTextField(
+                            value = disturbio,
+                            onValueChange = { if (!readOnly) disturbio = it },
+                            label = { Text("Disturbio") },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !readOnly
                         )
 
-                        Text("Disturbio")
-                        val disturbioOptions = listOf(
-                            "Inundación",
-                            "Quema",
-                            "Tala",
-                            "Erosión",
-                            "Minería",
-                            "Carretera",
-                            "Más plantas acuáticas",
-                            "Otro"
-                        )
-                        if (disturbio == "") {
-                            disturbio = disturbioOptions[0]
-                        }
-                        Column {
-                            disturbioOptions.forEach { option ->
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    RadioButton(
-                                        selected = disturbio == option,
-                                        onClick = { disturbio = option },
-                                        colors = RadioButtonDefaults.colors(
-                                            selectedColor = Color(0xFF4E7029),
-                                            unselectedColor = Color.Gray
-                                        )
-                                    )
-                                    Text(option, modifier = Modifier.padding(start = 8.dp))
-                                }
-                            }
-                        }
-
-
-                        // Camera Button
+                        // Fotos
                         Button(
-                            onClick = { showCamera = true },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF4E7029),
-                                contentColor = Color.White
-                            ),
+                            onClick = { if (!readOnly) showCamera = true },
+                            enabled = !readOnly,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4E7029), contentColor = Color.White),
                             shape = RoundedCornerShape(10)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Take Photo",
-                                modifier = Modifier.size(24.dp)
-                            )
+                            Icon(imageVector = Icons.Default.Add, contentDescription = "Take Photo", modifier = Modifier.size(24.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Tomar Foto")
                         }
 
-                        // Log.d("ObservationForm", "savedImageUri: ${savedImageUri.value}")
-
-                        // Display the saved image
                         savedImageUris.value.forEach { uri ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(model = uri),
-                                    contentDescription = "Saved Image",
-                                    modifier = Modifier.size(100.dp)
-                                )
-                                Button(onClick = {
-                                    savedImageUris.value = savedImageUris.value.toMutableList().apply { remove(uri) }
-                                },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color.Transparent // Removes background color
-                                    ),
-                                    elevation = null // Removes shadow/elevation for a completely flat button
-                                ) {
-                                    Text(text = "X",
-                                        color = Color.Red,
-                                        fontSize = 20.sp)
-                                }
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Image(painter = rememberAsyncImagePainter(model = uri), contentDescription = "Saved Image", modifier = Modifier.size(100.dp))
+                                Button(
+                                    onClick = {
+                                        if (!readOnly) {
+                                            savedImageUris.value = savedImageUris.value.toMutableList().apply { remove(uri) }
+                                        }
+                                    },
+                                    enabled = !readOnly,
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                                    elevation = null
+                                ) { Text(text = "X", color = Color.Red, fontSize = 20.sp) }
                             }
                         }
 
-                        // Observaciones
                         OutlinedTextField(
                             value = observaciones,
-                            onValueChange = { observaciones = it },
+                            onValueChange = { if (!readOnly) observaciones = it },
                             label = { Text("Observaciones") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(100.dp),
-                            maxLines = 4
+                            modifier = Modifier.fillMaxWidth().height(100.dp),
+                            maxLines = 4,
+                            enabled = !readOnly
                         )
 
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Button(
                                 onClick = { navController.navigate("home") },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF4E7029),
-                                    contentColor = Color.White
-                                ),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4E7029), contentColor = Color.White),
                                 shape = RoundedCornerShape(50),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text(
-                                    "Atras",
-                                    style = TextStyle(
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                )
+                                Text("Atras", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold))
                             }
 
                             Button(
                                 onClick = {
-                                    if (fecha.isNullOrEmpty()) {
-                                        fecha = getCurrentDate()
-                                    }
+                                    if (readOnly) return@Button
+                                    if (fecha.isEmpty()) fecha = getCurrentDate()
                                     editado = getCurrentDate()
                                     val formulario = FormularioTresEntity(
                                         codigo = codigo,
@@ -503,44 +364,26 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
                                     ).withID(formularioId)
 
                                     runBlocking {
-                                        // Insert regresa su id
                                         val formId = appContainer.usuariosRepository.insertUserWithFormularioTres(
                                             context.accountInfo.user_id, formulario
                                         )
-                                        Log.d("ImageDAO", "formId: $formId")
-
-                                        // Borrar todas las fotos en ese reporte
                                         appContainer.formulariosRepository.deleteImagesByFormulario(
-                                            formularioId = formId,
-                                            formularioType = "Formulario3"
+                                            formularioId = formId, formularioType = "Formulario3"
                                         )
-
-                                        // Agregar todas las imagenes al reporte
-                                        savedImageUris.value.forEach { uri ->
-                                            val image = ImageEntity(
-                                                formularioId = formId,
-                                                formularioType = "Formulario3",
-                                                imageUri = uri.toString()
+                                        savedImageUris.value.forEach { u ->
+                                            appContainer.formulariosRepository.insertImage(
+                                                ImageEntity(formularioId = formId, formularioType = "Formulario3", imageUri = u.toString())
                                             )
-                                            appContainer.formulariosRepository.insertImage(image)
                                         }
                                     }
                                     navController.navigate("home")
                                 },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF4E7029),
-                                    contentColor = Color.White
-                                ),
+                                enabled = !readOnly,
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4E7029), contentColor = Color.White),
                                 shape = RoundedCornerShape(50),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text(
-                                    "Guardar",
-                                    style = TextStyle(
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                )
+                                Text("Guardar", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold))
                             }
                         }
                     }

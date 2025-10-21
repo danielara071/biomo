@@ -72,6 +72,7 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     val ubicacion = Ubicacion(context)
 
+    var readOnly by remember { mutableStateOf(false) }
     var clima by remember { mutableStateOf("") }
     var temporada by remember { mutableStateOf("Verano/Seca") }
     var zona by remember { mutableStateOf("") }
@@ -91,6 +92,7 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
         }
 
         if (formulario != null) {
+            readOnly = formulario.synced
             clima = formulario.clima
             temporada = formulario.temporada
             zona = formulario.zona
@@ -141,7 +143,7 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
             }
         }
     }
-    
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -185,6 +187,18 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
+                        // Banner de Solo lectura
+                        if (readOnly) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color(0xFFFFF3CD), RoundedCornerShape(8.dp))
+                                    .padding(12.dp)
+                            ) {
+                                Text("Formulario subido: solo lectura", color = Color(0xFF856404))
+                            }
+                        }
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -232,7 +246,8 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                             weatherOptions.forEachIndexed { index, option ->
                                 IconToggleButton(
                                     checked = clima == option,
-                                    onCheckedChange = { clima = option },
+                                    onCheckedChange = { if(!readOnly) clima = option },
+                                    enabled = !readOnly,
                                     modifier = Modifier.size(150.dp)
                                 ) {
                                     Box(
@@ -264,7 +279,8 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     RadioButton(
                                         selected = temporada == option,
-                                        onClick = { temporada = option },
+                                        onClick = { if(!readOnly) temporada = option },
+                                        enabled = !readOnly,
                                         colors = RadioButtonDefaults.colors(
                                             selectedColor = Color(0xFF4E7029),
                                             unselectedColor = Color.Gray
@@ -286,7 +302,8 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 RadioButton(
                                     selected = zona == option,
-                                    onClick = { zona = option },
+                                    onClick = { if (!readOnly) zona = option },
+                                    enabled = !readOnly,
                                     colors = RadioButtonDefaults.colors(
                                         selectedColor = Color(0xFF4E7029),
                                         unselectedColor = Color.Gray
@@ -301,6 +318,7 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                             value = pluviosidad,
                             onValueChange = { pluviosidad = it },
                             label = { Text("Pluviosidad (mm)") },
+                            enabled = !readOnly,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -308,8 +326,9 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                         // Temperatura Máxima Field
                         OutlinedTextField(
                             value = temperaturaMaxima,
-                            onValueChange = { temperaturaMaxima = it },
+                            onValueChange = { if(!readOnly) temperaturaMaxima = it },
                             label = { Text("Temperatura máxima") },
+                            enabled = !readOnly,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -319,6 +338,7 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                             value = humedadMaxima,
                             onValueChange = { humedadMaxima = it },
                             label = { Text("Humedad máxima") },
+                            enabled = !readOnly,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -328,6 +348,7 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                             value = temperaturaMinima,
                             onValueChange = { temperaturaMinima = it },
                             label = { Text("Temperatura mínima") },
+                            enabled = !readOnly,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -337,12 +358,14 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                             value = nivelQuebrada,
                             onValueChange = { nivelQuebrada = it },
                             label = { Text("Nivel Quebrada (mt)") },
+                            enabled = !readOnly,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
                         // Camera Button
                         Button(
-                            onClick = { showCamera = true },
+                            onClick = { if(!readOnly)showCamera = true },
+                            enabled = !readOnly,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF4E7029),
                                 contentColor = Color.White
@@ -372,8 +395,9 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                                     modifier = Modifier.size(100.dp)
                                 )
                                 Button(onClick = {
-                                    savedImageUris.value = savedImageUris.value.toMutableList().apply { remove(uri) }
+                                    if(!readOnly) savedImageUris.value = savedImageUris.value.toMutableList().apply { remove(uri) }
                                 },
+                                    enabled = !readOnly,
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color.Transparent // Removes background color
                                     ),
@@ -385,7 +409,7 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
                                 }
                             }
                         }
-                        
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -412,6 +436,7 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
 
                             Button(
                                 onClick = {
+                                    if (readOnly) return@Button
                                     if (fecha.isNullOrEmpty()) {
                                         fecha = getCurrentDate()
                                     }
@@ -458,6 +483,7 @@ fun ObservationFormSiete(navController: NavController, formularioId: Long = 0) {
 
                                     navController.navigate("home")
                                 },
+                                enabled = !readOnly,
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(0xFF4E7029),
                                     contentColor = Color.White

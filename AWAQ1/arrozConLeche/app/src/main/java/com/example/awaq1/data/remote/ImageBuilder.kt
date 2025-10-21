@@ -38,31 +38,3 @@ fun metadataBodyFromEntitySafe(entity: Any): RequestBody {
     android.util.Log.d("Upload", "metadata.clean = $json")
     return json.toRequestBody(JSON)
 }
-
-/**
- * Always returns a PNG image part, regardless of the original format (JPG/HEIC/etc).
- * This guarantees the backend receives the 'image' part and avoids 500s due to missing files.
- */
-fun pngPartFromAnyUri(
-    context: Context,
-    imageUri: Uri,
-    partName: String = "image",
-    fileName: String = "photo.png"
-): MultipartBody.Part {
-    val resolver = context.contentResolver
-
-    // Decode the source into a Bitmap
-    val bmp: Bitmap = resolver.openInputStream(imageUri).use { input ->
-        requireNotNull(input) { "Unable to open image stream" }
-        requireNotNull(BitmapFactory.decodeStream(input)) { "Failed to decode image" }
-    }
-
-    // Re-encode as PNG into memory
-    val bytes = ByteArrayOutputStream().use { out ->
-        require(bmp.compress(Bitmap.CompressFormat.PNG, 100, out)) { "PNG compression failed" }
-        out.toByteArray()
-    }
-
-    val body = bytes.toRequestBody(PNG)
-    return MultipartBody.Part.createFormData(partName, fileName, body)
-}
