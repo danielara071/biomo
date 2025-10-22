@@ -141,12 +141,7 @@ fun LogIn(
                         checked = isOfflineMode,
                         onCheckedChange = { 
                             isOfflineMode = it
-                            if (it) {
-                                // Generate offline key when switching to offline mode
-                                scope.launch {
-                                    offlineKey = offlineAuthRepository.generateOfflineKey()
-                                }
-                            } else {
+                            if (!it) {
                                 offlineKey = ""
                             }
                         }
@@ -162,7 +157,7 @@ fun LogIn(
             if (isOfflineMode) {
                 // Offline Key Field
                 TextField(
-                    value = "",
+                    value = offlineKey,
                     onValueChange = { offlineKey = it },
                     label = { Text("Clave Offline") },
                     singleLine = true,
