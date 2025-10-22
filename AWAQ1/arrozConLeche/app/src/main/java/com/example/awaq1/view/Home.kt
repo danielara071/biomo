@@ -183,6 +183,7 @@ fun Home(
     val snack = remember { SnackbarHostState() }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snack) },
         bottomBar = {
             Column() {
                 BottomNavigationBar(navController)
@@ -281,12 +282,14 @@ fun Home(
                                     } else {
                                         "Sincronizados: ${result.successCount}. Errores: ${result.errors.size}"
                                     }
+
                                     //forma chopped
                                     // TODO: refactor this efficiently
                                     navController.navigate("home") {
                                         popUpTo("home") { inclusive = true }
                                     }
-                                    snack.showSnackbar(msg)
+                                    snack.showSnackbar(msg,
+                                        withDismissAction = true)
                                 }
                             }
                         },
