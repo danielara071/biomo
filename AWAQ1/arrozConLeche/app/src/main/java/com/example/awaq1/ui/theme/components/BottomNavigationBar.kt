@@ -42,7 +42,7 @@ fun BottomNavigationBar(navController: NavController) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .height(100.dp)
         ) {
             // Home Icon Button
             NavigationButton(
