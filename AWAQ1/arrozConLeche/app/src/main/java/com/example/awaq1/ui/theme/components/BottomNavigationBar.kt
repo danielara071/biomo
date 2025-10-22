@@ -46,7 +46,7 @@ fun BottomNavigationBar(navController: NavController) {
         ) {
             // Home Icon Button
             NavigationButton(
-                label = "Home",
+                label = "Inicio",
                 icon = Icons.Default.Home,
                 isActive = currentRoute == "home",
                 onClick = {
@@ -76,7 +76,7 @@ fun BottomNavigationBar(navController: NavController) {
 
             //Search Button
             NavigationButton(
-                label = "Search",
+                label = "Busqueda",
                 icon = Icons.Default.Search,
                 isActive = currentRoute == "buscar",
                 onClick = {
@@ -88,7 +88,7 @@ fun BottomNavigationBar(navController: NavController) {
 
             // Settings Icon Button
             NavigationButton(
-                label = "Settings",
+                label = "Configuraciones",
                 icon = Icons.Default.Settings,
                 isActive = currentRoute == "settings",
                 onClick = {
