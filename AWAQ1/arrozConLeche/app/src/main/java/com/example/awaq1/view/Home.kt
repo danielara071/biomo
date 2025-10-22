@@ -228,7 +228,7 @@ fun Home(
                 ) {
                     Row {
                         Text(
-                            text = "DASHBOARD",
+                            text = "PANEL",
                             fontSize = 30.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF333333),

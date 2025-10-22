@@ -219,8 +219,8 @@ fun SelectFormularioScreen(navController: NavController) {
                 FormChooseButton(FormTresID(), "Validación de Cobertura", navController)
                 FormChooseButton(FormCuatroID(), "Parcela de Vegetación", navController)
                 FormChooseButton(FormCincoID(), "Fauna Busqueda Libre", navController)
-                FormChooseButton(FormSeisID(), "Camaras Trampa", navController)
-                FormChooseButton(FormSieteID(), "Variables Climaticas", navController)
+                FormChooseButton(FormSeisID(), "Cámaras Trampa", navController)
+                FormChooseButton(FormSieteID(), "Variables Climáticas", navController)
             }
         }
     }
