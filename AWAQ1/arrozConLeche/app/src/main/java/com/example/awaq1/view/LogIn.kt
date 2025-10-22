@@ -162,7 +162,7 @@ fun LogIn(
             if (isOfflineMode) {
                 // Offline Key Field
                 TextField(
-                    value = offlineKey,
+                    value = "",
                     onValueChange = { offlineKey = it },
                     label = { Text("Clave Offline") },
                     singleLine = true,
@@ -176,12 +176,12 @@ fun LogIn(
                         .padding(top = 20.dp)
                         .fillMaxWidth()
                 )
-                Text(
-                    text = "Tu clave offline: $offlineKey",
-                    fontSize = 12.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
+//                Text(
+//                    text = "Tu clave offline: $offlineKey",
+//                    fontSize = 12.sp,
+//                    color = Color.Gray,
+//                    modifier = Modifier.padding(top = 8.dp)
+//                )
                 Text(
                     text = "Nota: Solo puedes usar modo offline si ya has iniciado sesión antes.",
                     fontSize = 10.sp,
