@@ -247,12 +247,14 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
                                 onClick = { if (!readOnly) seguimiento = true },
                                 enabled = !readOnly
                             )
+                            Text("Si")
                             Spacer(Modifier.width(8.dp))
                             RadioButton(
                                 selected = !seguimiento,
                                 onClick = { if (!readOnly) seguimiento = false },
                                 enabled = !readOnly
                             )
+                            Text("No")
                         }
 
                         Text("Cambio")
@@ -262,12 +264,14 @@ fun ObservationFormTres(navController: NavController, formularioId: Long = 0L) {
                                 onClick = { if (!readOnly) cambio = true },
                                 enabled = !readOnly
                             )
+                            Text("Si")
                             Spacer(Modifier.width(8.dp))
                             RadioButton(
                                 selected = !cambio,
                                 onClick = { if (!readOnly) cambio = false },
                                 enabled = !readOnly
                             )
+                            Text("No")
                         }
 
                         OutlinedTextField(

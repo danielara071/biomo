@@ -83,7 +83,6 @@ fun Home(
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     var query by remember { mutableStateOf("") }
     val offlineRepo = offlineAuthRepository ?: appContainer.offlineAuthRepository
-//    var refreshTrigger by remember { mutableStateOf(0) }
 
     val isOfflineMode by remember(offlineRepo) {
         offlineRepo?.isOfflineMode() ?: kotlinx.coroutines.flow.flowOf(false)
