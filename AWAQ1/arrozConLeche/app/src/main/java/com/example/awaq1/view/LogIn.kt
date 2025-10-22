@@ -189,7 +189,7 @@ fun LogIn(
                 TextField (
                     value = username,
                     onValueChange = {username = it },
-                    label = { Text("Email") },
+                    label = { Text("Correo") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                     modifier = Modifier
