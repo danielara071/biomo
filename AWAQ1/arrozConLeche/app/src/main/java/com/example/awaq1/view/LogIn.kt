@@ -77,6 +77,8 @@ fun LogIn(
                     } else {
                         val success = offlineAuthRepository.signInOffline(offlineKey)
                         if (success) {
+                            offlineAuthRepository.setOfflineMode(true)
+                            
                             // Get the actual username for this offline key
                             val offlineUsername = offlineAuthRepository.signInOfflineWithUsername(offlineKey)
                             if (offlineUsername != null) {
@@ -91,6 +93,8 @@ fun LogIn(
                 } else {
                     // Llama a tu backend (guarda el token en TokenManager)
                     authRepository.signIn(username, password)
+
+                    offlineAuthRepository.setOfflineMode(false)
                     onLoginSuccess(username)
                 }
             } catch (e: Exception) {

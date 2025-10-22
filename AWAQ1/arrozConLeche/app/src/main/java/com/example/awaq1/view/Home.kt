@@ -79,17 +79,18 @@ fun Home(
     offlineAuthRepository: OfflineAuthRepository? = null
 ) {
     val context = LocalContext.current as MainActivity
+    val appContainer = context.container
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     var query by remember { mutableStateOf("") }
-    var isOfflineMode by remember { mutableStateOf(false) }
+    val offlineRepo = offlineAuthRepository ?: appContainer.offlineAuthRepository
+
+    val isOfflineMode by remember(offlineRepo) {
+        offlineRepo?.isOfflineMode() ?: kotlinx.coroutines.flow.flowOf(false)
+    }.collectAsState(initial = false)
     val ubicacion = Ubicacion(context)
     
     // Check if user is in offline mode
-    LaunchedEffect(Unit) {
-        offlineAuthRepository?.isOfflineMode()?.collect { offline ->
-            isOfflineMode = offline
-        }
-    }
+
     
     if(location == null){
         LaunchedEffect(Unit) {
@@ -109,7 +110,6 @@ fun Home(
     //Username para saludo
     val nombre = context.accountInfo.username.substringBefore("@")
 
-    val appContainer = context.container
     val forms1: List<FormularioUnoEntity> by appContainer.usuariosRepository.getAllFormularioUnoForUserID(
         context.accountInfo.user_id
     )

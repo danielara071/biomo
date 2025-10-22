@@ -50,6 +50,9 @@ class OfflineAuthRepository(
         tokenManager.clearOfflineMode()
     }
 
+    suspend fun setOfflineMode(enabled: Boolean) {
+        tokenManager.setOfflineMode(enabled)
+    }
     fun getOfflineKey(): Flow<String?> = tokenManager.getOfflineKey()
     
     fun isOfflineMode(): Flow<Boolean> = tokenManager.isOfflineMode()
