@@ -83,6 +83,7 @@ fun Home(
     var location by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     var query by remember { mutableStateOf("") }
     val offlineRepo = offlineAuthRepository ?: appContainer.offlineAuthRepository
+//    var refreshTrigger by remember { mutableStateOf(0) }
 
     val isOfflineMode by remember(offlineRepo) {
         offlineRepo?.isOfflineMode() ?: kotlinx.coroutines.flow.flowOf(false)
@@ -280,6 +281,11 @@ fun Home(
                                         "Sincronizados: ${result.successCount}"
                                     } else {
                                         "Sincronizados: ${result.successCount}. Errores: ${result.errors.size}"
+                                    }
+                                    //forma chopped
+                                    // TODO: refactor this efficiently
+                                    navController.navigate("home") {
+                                        popUpTo("home") { inclusive = true }
                                     }
                                     snack.showSnackbar(msg)
                                 }
